@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,7 +62,7 @@
 </head>
 <body class="bg-gray-50 text-gray-900 overflow-x-hidden">
     <div id="root"></div>
-    <!-- Vite entry point: using absolute path for reliability -->
-    <script type="module" src="/index.tsx"></script>
+    <!-- Fixed: Use relative path and ensured no leading slash for compatibility with base: './' -->
+    <script type="module" src="index.tsx"></script>
 </body>
 </html>
