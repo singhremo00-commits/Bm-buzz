@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { MOCK_NEWS, Language, TRANSLATIONS, CATEGORY_LABELS } from '../constants';
+import { TrendingUp, Clock, Mail, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 
 interface SidebarProps {
   onPostClick: (id: string) => void;
@@ -11,10 +12,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onPostClick, currentLang }) => {
   const t = TRANSLATIONS[currentLang];
   const labels = CATEGORY_LABELS[currentLang];
   
-  // Popular posts (first 3 from mock)
+  // Popular posts
   const popularPosts = MOCK_NEWS.slice(0, 3);
   
-  // Recent posts (sorted by date descending)
+  // Recent posts
   const recentPosts = [...MOCK_NEWS].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   ).slice(0, 4);
@@ -23,7 +24,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onPostClick, currentLang }) => {
     <aside className="space-y-10">
       {/* Newsletter Widget */}
       <div className="bg-secondary text-white p-6 rounded-sm shadow-lg">
-        <h3 className="text-xl font-bold mb-2 font-serif">{t.join}</h3>
+        <div className="flex items-center space-x-2 mb-2">
+          <Mail size={20} className="text-primary" />
+          <h3 className="text-xl font-bold font-serif">{t.join}</h3>
+        </div>
         <p className="text-sm text-gray-400 mb-4">{t.newsletterSub}</p>
         <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
           <input 
@@ -31,8 +35,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onPostClick, currentLang }) => {
             placeholder={t.placeholder} 
             className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-sm text-sm focus:outline-none focus:border-primary transition-colors" 
           />
-          <button className="w-full bg-primary hover:bg-red-700 text-white font-bold py-2 uppercase text-xs tracking-widest transition-colors">
-            {t.subscribe}
+          <button className="w-full bg-primary hover:bg-red-700 text-white font-bold py-2 uppercase text-xs tracking-widest transition-colors flex items-center justify-center space-x-2">
+            <span>{t.subscribe}</span>
           </button>
         </form>
       </div>
@@ -40,6 +44,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onPostClick, currentLang }) => {
       {/* Popular Posts Section */}
       <section>
         <div className="flex items-center space-x-2 mb-6 border-b-2 border-primary pb-1">
+          <TrendingUp size={18} className="text-primary" />
           <h3 className="text-lg font-extrabold uppercase tracking-tight">{t.popular}</h3>
         </div>
         <div className="space-y-6">
@@ -55,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onPostClick, currentLang }) => {
                   <span className="text-[10px] font-bold text-primary uppercase mb-1 block">
                     {labels[post.category] || post.category}
                   </span>
-                  <h4 className="text-sm font-bold leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                  <h4 className="text-sm font-bold leading-tight group-hover:text-primary transition-colors line-clamp-2 font-serif">
                     {info.title}
                   </h4>
                 </div>
@@ -68,6 +73,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onPostClick, currentLang }) => {
       {/* Recent Posts Section */}
       <section>
         <div className="flex items-center space-x-2 mb-6 border-b-2 border-secondary pb-1">
+          <Clock size={18} className="text-secondary" />
           <h3 className="text-lg font-extrabold uppercase tracking-tight">{t.recent}</h3>
         </div>
         <div className="space-y-5">
@@ -85,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onPostClick, currentLang }) => {
                   </span>
                   <span className="text-[9px] font-bold text-gray-400 uppercase">{post.date}</span>
                 </div>
-                <h4 className="text-sm font-bold leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                <h4 className="text-sm font-bold leading-snug group-hover:text-primary transition-colors line-clamp-2 font-serif">
                   {info.title}
                 </h4>
               </div>
@@ -100,10 +106,18 @@ const Sidebar: React.FC<SidebarProps> = ({ onPostClick, currentLang }) => {
           <h3 className="text-lg font-extrabold uppercase tracking-tight">{t.connect}</h3>
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <a href="#" className="flex items-center justify-center py-2 bg-[#1877F2] text-white text-[10px] font-bold uppercase rounded-sm hover:opacity-90">FB</a>
-          <a href="#" className="flex items-center justify-center py-2 bg-[#1DA1F2] text-white text-[10px] font-bold uppercase rounded-sm hover:opacity-90">TW</a>
-          <a href="#" className="flex items-center justify-center py-2 bg-[#E4405F] text-white text-[10px] font-bold uppercase rounded-sm hover:opacity-90">IG</a>
-          <a href="#" className="flex items-center justify-center py-2 bg-[#FF0000] text-white text-[10px] font-bold uppercase rounded-sm hover:opacity-90">YT</a>
+          <a href="#" className="flex items-center justify-center space-x-2 py-2 bg-[#1877F2] text-white text-[10px] font-bold uppercase rounded-sm hover:opacity-90">
+            <Facebook size={12} /> <span>Facebook</span>
+          </a>
+          <a href="#" className="flex items-center justify-center space-x-2 py-2 bg-[#1DA1F2] text-white text-[10px] font-bold uppercase rounded-sm hover:opacity-90">
+            <Twitter size={12} /> <span>Twitter</span>
+          </a>
+          <a href="#" className="flex items-center justify-center space-x-2 py-2 bg-[#E4405F] text-white text-[10px] font-bold uppercase rounded-sm hover:opacity-90">
+            <Instagram size={12} /> <span>Instagram</span>
+          </a>
+          <a href="#" className="flex items-center justify-center space-x-2 py-2 bg-[#FF0000] text-white text-[10px] font-bold uppercase rounded-sm hover:opacity-90">
+            <Youtube size={12} /> <span>Youtube</span>
+          </a>
         </div>
       </section>
 
