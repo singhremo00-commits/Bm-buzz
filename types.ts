@@ -1,0 +1,33 @@
+
+// Exporting Language type to be used throughout the application
+export type Language = 'en' | 'bn' | 'hi';
+
+export interface NewsPost {
+  id: string;
+  category: string;
+  author: string;
+  date: string;
+  image: string;
+  featured?: boolean;
+  trending?: boolean;
+  translations: {
+    [key: string]: {
+      title: string;
+      excerpt: string;
+      content: string;
+    }
+  };
+}
+
+export type Category = 
+  | 'Home' 
+  | 'News' 
+  | 'Music' 
+  | 'Movies' 
+  | 'Culture' 
+  | 'Events' 
+  | 'Interviews' 
+  | 'Videos' 
+  | 'Gallery' 
+  | 'Talent Showcase' 
+  | 'Jobs';
