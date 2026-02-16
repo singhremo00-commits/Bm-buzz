@@ -16,7 +16,9 @@ import {
   Trash2,
   Edit3,
   PlusCircle,
-  Clock
+  Clock,
+  Upload,
+  XCircle
 } from 'lucide-react';
 
 interface AdminProps {
@@ -32,14 +34,17 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
   const [newsList, setNewsList] = useState<any[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form State
   const [formData, setFormData] = useState({
     title: '',
     category: 'News',
-    imageUrl: '',
+    imageUrl: '', // This stores the current URL (either from DB or newly uploaded)
     description: ''
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const fetchAdminNews = useCallback(async () => {
     try {
@@ -74,6 +79,14 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
   const handleLogout = () => {
     setIsAuthenticated(false);
     setPassword('');
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
   };
 
   const applyTag = (startTag: string, endTag: string) => {
@@ -113,6 +126,8 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
       imageUrl: item.image_url,
       description: item.content
     });
+    setSelectedFile(null);
+    setPreviewUrl(item.image_url);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -137,6 +152,27 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
   const resetForm = () => {
     setEditingId(null);
     setFormData({ title: '', category: 'News', imageUrl: '', description: '' });
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('news-images')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage
+      .from('news-images')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -144,11 +180,22 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
     setLoading(true);
     
     try {
+      let finalImageUrl = formData.imageUrl;
+
+      // If a new file is selected, upload it first
+      if (selectedFile) {
+        finalImageUrl = await uploadImage(selectedFile);
+      }
+
+      if (!finalImageUrl && !editingId) {
+        throw new Error("Please select an image for the news story.");
+      }
+
       const payload = {
         title: String(formData.title || '').trim(),
         category: String(formData.category || 'News'),
         content: String(formData.description || '').trim(),
-        image_url: String(formData.imageUrl || '').trim(),
+        image_url: finalImageUrl,
         featured: false
       };
 
@@ -309,16 +356,44 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
 
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center">
-                  <ImageIcon size={14} className="mr-2 text-primary" /> Feature Image URL
+                  <ImageIcon size={14} className="mr-2 text-primary" /> News Image
                 </label>
-                <input
-                  type="url"
-                  required
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
-                  placeholder="https://..."
-                  className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-600"
-                />
+                <div className="flex flex-col md:flex-row gap-6 items-start">
+                   <div className="flex-1 w-full">
+                      <label 
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-200 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all group"
+                      >
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Upload className="w-8 h-8 mb-3 text-gray-400 group-hover:text-primary transition-colors" />
+                          <p className="mb-2 text-sm text-gray-500"><span className="font-black uppercase text-[10px] tracking-widest">Click to upload photo</span></p>
+                          <p className="text-xs text-gray-400">PNG, JPG or JPEG (MAX. 5MB)</p>
+                        </div>
+                        <input 
+                          ref={fileInputRef}
+                          type="file" 
+                          accept="image/*" 
+                          className="hidden" 
+                          onChange={handleFileChange}
+                        />
+                      </label>
+                   </div>
+                   {previewUrl && (
+                     <div className="relative w-full md:w-32 h-32 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 shadow-inner group">
+                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setSelectedFile(null);
+                            setPreviewUrl(editingId ? formData.imageUrl : null);
+                            if (fileInputRef.current) fileInputRef.current.value = '';
+                          }}
+                          className="absolute top-1 right-1 bg-white/80 hover:bg-primary hover:text-white rounded-full p-1 shadow-md transition-all opacity-0 group-hover:opacity-100"
+                        >
+                          <XCircle size={14} />
+                        </button>
+                     </div>
+                   )}
+                </div>
               </div>
             </div>
 
@@ -351,7 +426,7 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
                 className="w-full md:w-auto px-16 py-5 bg-black hover:bg-primary text-white font-black uppercase tracking-[0.3em] rounded-2xl shadow-2xl transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center space-x-4 text-sm group"
               >
                 {loading ? <span className="animate-spin">🌀</span> : (editingId ? <Edit3 size={20} /> : <PlusCircle size={20} />)}
-                <span>{loading ? 'Processing...' : (editingId ? 'Update Story' : 'Publish Story')}</span>
+                <span>{loading ? (editingId ? 'Updating...' : 'Publishing...') : (editingId ? 'Update Story' : 'Publish Story')}</span>
               </button>
             </div>
           </form>
