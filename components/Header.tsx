@@ -60,8 +60,8 @@ const CategoryIcon: React.FC<{ category: string; className?: string }> = ({ cate
 const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLang, onLanguageChange }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNewsDropdownOpen, setIsNewsDropdownOpen] = useState(false);
-  const t = TRANSLATIONS[currentLang];
-  const labels = CATEGORY_LABELS[currentLang];
+  const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+  const labels = CATEGORY_LABELS[currentLang] || CATEGORY_LABELS.en;
 
   const handleAreaClick = (cat: string) => {
     onCategoryClick(cat);
@@ -70,8 +70,8 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white shadow-xl border-b border-gray-100 font-sans">
-      <div className="bg-secondary text-white py-2">
+    <header className="sticky top-0 z-[100] w-full bg-white shadow-xl border-b border-gray-100 font-sans">
+      <div className="bg-secondary text-white py-1.5">
         <div className="container mx-auto px-4 flex justify-between items-center text-[10px] md:text-xs font-bold uppercase tracking-widest">
           <div className="hidden md:flex items-center space-x-3">
             <Globe size={14} className="text-primary" />
@@ -84,7 +84,7 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
                 <button
                   key={lang.code}
                   onClick={() => onLanguageChange(lang.code as Language)}
-                  className={`px-2 py-1 rounded-md transition-all ${
+                  className={`px-2 py-0.5 rounded transition-all ${
                     currentLang === lang.code ? 'bg-primary text-white font-black' : 'opacity-60 hover:opacity-100'
                   }`}
                 >
@@ -96,9 +96,9 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
         </div>
       </div>
 
-      <nav className="container mx-auto px-4 py-5 flex items-center justify-between">
+      <nav className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="cursor-pointer" onClick={onLogoClick}>
-          <h1 className="text-3xl md:text-4xl font-black font-title tracking-tighter text-secondary">
+          <h1 className="text-2xl md:text-3xl font-black font-title tracking-tighter text-secondary">
             BM<span className="text-primary">BUZZ</span>
           </h1>
         </div>
@@ -118,7 +118,7 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
               onMouseLeave={() => setIsNewsDropdownOpen(false)}>
             <button
               onClick={() => onCategoryClick('News')}
-              className="flex items-center space-x-2 text-xs font-black font-title uppercase text-secondary hover:text-primary transition-all tracking-wider py-2"
+              className="flex items-center space-x-2 text-xs font-black font-title uppercase text-secondary hover:text-primary transition-all tracking-wider py-1"
             >
               <CategoryIcon category="News" className="text-primary/70" />
               <span>{labels['News']}</span>
@@ -156,49 +156,101 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
           ))}
         </ul>
 
-        <button className="lg:hidden p-3 text-secondary bg-gray-50 rounded-xl" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+        <button 
+          className="lg:hidden p-2 text-secondary bg-gray-50 rounded-xl hover:bg-primary hover:text-white transition-all active:scale-95 shadow-sm" 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle Menu"
+        >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </nav>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-100 py-6 absolute w-full left-0 shadow-2xl max-h-[85vh] overflow-y-auto z-50">
-          <ul className="flex flex-col px-8 space-y-8 pb-10">
-            <li>
-              <div className="text-primary font-black uppercase tracking-[0.2em] text-[10px] mb-6 border-b border-gray-50 pb-2">{labels['News']}</div>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-                {REGIONAL_CATEGORIES.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => handleAreaClick(cat)}
-                    className="flex items-center space-x-3 text-xs font-bold text-secondary hover:text-primary transition-all uppercase tracking-wide"
-                  >
-                    <CategoryIcon category={cat} className="text-primary/40" />
-                    <span>{labels[cat]}</span>
-                  </button>
-                ))}
-              </div>
-            </li>
+      {/* Mobile Menu Popup */}
+      <div 
+        className={`lg:hidden fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setIsMenuOpen(false)}
+      >
+        <div 
+          className={`absolute right-0 top-0 h-full w-[80%] max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-white">
+            <h2 className="text-xl font-black font-title tracking-tighter text-secondary">
+              BM<span className="text-primary">BUZZ</span>
+            </h2>
+            <button 
+              onClick={() => setIsMenuOpen(false)}
+              className="p-2 text-gray-400 hover:text-primary hover:bg-gray-50 rounded-lg transition-all"
+            >
+              <X size={22} />
+            </button>
+          </div>
 
-            <li>
-              <div className="text-primary font-black uppercase tracking-[0.2em] text-[10px] mb-6 border-b border-gray-50 pb-2">Categories</div>
-              <div className="flex flex-col space-y-5">
-                {GENERAL_CATEGORIES.filter(c => c !== 'News').map((cat) => (
+          <div className="flex-1 overflow-y-auto py-5 px-5 space-y-6 pb-20">
+            {/* General Categories Section (Displayed First) */}
+            <div>
+              <div className="text-gray-400 font-bold uppercase tracking-widest text-[9px] mb-4 border-b border-gray-50 pb-2">
+                Categories
+              </div>
+              <div className="flex flex-col space-y-2">
+                {GENERAL_CATEGORIES.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => { onCategoryClick(cat); setIsMenuOpen(false); }}
-                    className="flex items-center space-x-4 text-xl font-black font-title uppercase text-secondary hover:text-primary transition-all tracking-tight"
+                    className="flex items-center space-x-3 p-3 text-base font-bold font-title uppercase text-secondary hover:bg-primary/5 hover:text-primary rounded-xl transition-all active:scale-[0.98]"
                   >
-                    <CategoryIcon category={cat} className="text-primary" />
+                    <CategoryIcon category={cat} className="text-primary/50" />
                     <span>{labels[cat] || cat}</span>
                   </button>
                 ))}
               </div>
-            </li>
-          </ul>
+            </div>
+
+            {/* News Regions Section (Displayed Second - "Niche Rakho") */}
+            <div>
+              <div className="text-gray-400 font-bold uppercase tracking-widest text-[9px] mb-4 border-b border-gray-50 pb-2">
+                {labels['News']} - {t.areas}
+              </div>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+                {REGIONAL_CATEGORIES.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => handleAreaClick(cat)}
+                    className="flex items-center space-x-2 text-xs font-semibold text-secondary hover:text-primary transition-all uppercase tracking-tight bg-gray-50/50 p-2.5 rounded-lg hover:bg-primary/5 active:scale-95 border border-transparent hover:border-primary/10"
+                  >
+                    <CategoryIcon category={cat} className="text-primary/30" />
+                    <span className="truncate">{labels[cat] || cat}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Language Selection in Menu */}
+            <div className="pt-6 border-t border-gray-100">
+               <div className="text-gray-400 font-bold uppercase tracking-widest text-[9px] mb-3">Language</div>
+               <div className="flex flex-wrap gap-2">
+                  {LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => onLanguageChange(lang.code as Language)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+                        currentLang === lang.code 
+                          ? 'bg-primary border-primary text-white shadow-sm' 
+                          : 'bg-white border-gray-200 text-secondary hover:border-primary'
+                      }`}
+                    >
+                      {lang.name}
+                    </button>
+                  ))}
+               </div>
+            </div>
+          </div>
+          
+          <div className="p-4 border-t border-gray-100 text-center bg-gray-50">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400 opacity-60">Voice of Bishnupriya Community</p>
+          </div>
         </div>
-      )}
+      </div>
     </header>
   );
 };
