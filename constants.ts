@@ -99,7 +99,7 @@ export const TRANSLATIONS: Record<Language, any> = {
     popular: "জনপ্রিয় খবর",
     latest: "সর্বশেষ আপডেট",
     join: "বাজ-এ যোগ দিন",
-    subscribe: "সাবস্ক্রাইব",
+    subscribe: "সাবাস্ক্রাইব",
     placeholder: "আপনার ইমেল",
     newsletterSub: "সরাসরি আপনার ইনবক্সে সর্বশেষ কমিউনিটি আপডেট পান।",
     exclusive: "এক্সক্লুসিভ",
@@ -131,4 +131,44 @@ export const TRANSLATIONS: Record<Language, any> = {
   }
 };
 
-export const MOCK_NEWS: NewsPost[] = [];
+export const MOCK_NEWS: NewsPost[] = [
+  {
+    id: '1',
+    category: 'Music',
+    author: 'Admin',
+    date: 'Oct 24, 2025',
+    featured: true,
+    image: 'https://picsum.photos/seed/music/1200/800',
+    translations: {
+      en: {
+        title: "Bishnupriya Music Awards 2025 Nominees Announced",
+        excerpt: "The long-awaited list of nominees for the annual Bishnupriya Music Awards is finally here, celebrating local talent.",
+        content: "The annual Bishnupriya Music Awards (BMA) has officially announced its 2025 nominees. This year sees a surge in independent artists from Tripura and Assam. Leading the pack is the 'Banar Moynago' crew with 5 nominations."
+      },
+      bn: {
+        title: "বিষ্ণুপ্রিয়া মিউজিক অ্যাওয়ার্ডস ২০২৫-এর মনোনীতদের নাম ঘোষণা",
+        excerpt: "বার্ষিক বিষ্ণুপ্রিয়া মিউজিক অ্যাওয়ার্ডের জন্য দীর্ঘ প্রতীক্ষিত মনোনীতদের তালিকা অবশেষে প্রকাশিত হয়েছে।",
+        content: "বার্ষিক বিষ্ণুপ্রিয়া মিউজিক অ্যাওয়ার্ডস (BMA) ২০২৫-এর মনোনীতদের নাম আনুষ্ঠানিকভাবে ঘোষণা করা হয়েছে।"
+      }
+    }
+  },
+  {
+    id: '2',
+    category: 'Culture',
+    author: 'Editor',
+    date: 'Oct 23, 2025',
+    image: 'https://picsum.photos/seed/culture/1200/800',
+    translations: {
+      en: {
+        title: "The Art of Pung Cholom: A Heritage Revived",
+        excerpt: "Younger generations are taking a keen interest in traditional Bishnupriya dance forms like Pung Cholom.",
+        content: "Across the community, we are seeing a beautiful revival of Pung Cholom. Workshops in Silchar are seeing record participation."
+      },
+      bn: {
+        title: "পুং চোলম শিল্প: একটি ঐতিহ্যের পুনর্জাগরণ",
+        excerpt: "তরুণ প্রজন্ম পুং চোলমের মতো ঐতিহ্যবাহী নৃত্যশৈলীতে গভীর আগ্রহ দেখাচ্ছে।",
+        content: "সম্প্রদায় জুড়ে আমরা পুং চোলমের একটি সুন্দর পুনর্জাগরণ দেখতে পাচ্ছি।"
+      }
+    }
+  }
+];

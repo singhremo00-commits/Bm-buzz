@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { Language, TRANSLATIONS, CATEGORIES, CATEGORY_LABELS } from './constants';
+import { Language, CATEGORIES } from './constants';
+import { supabase } from './supabaseClient';
 import { 
   Lock, 
   FileText, 
@@ -13,16 +14,13 @@ import {
   Bold, 
   Italic 
 } from 'lucide-react';
-import { db } from './firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 interface AdminProps {
   currentLang: Language;
   onBack: () => void;
-  onPublish?: (data: any) => void;
 }
 
-const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
+const Admin: React.FC<AdminProps> = ({ onBack }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -84,29 +82,28 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
     try {
-      // Save to Firestore 'news' collection
-      await addDoc(collection(db, "news"), {
-        title: formData.title,
-        category: formData.category,
-        content: formData.description,
-        imageUrl: formData.imageUrl,
-        author: 'Admin',
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        timestamp: serverTimestamp(),
-        // Simple translation wrap for app compatibility
-        translations: {
-          en: { title: formData.title, excerpt: formData.description.substring(0, 150) + '...', content: formData.description },
-          bn: { title: formData.title, excerpt: formData.description.substring(0, 150) + '...', content: formData.description },
-          hi: { title: formData.title, excerpt: formData.description.substring(0, 150) + '...', content: formData.description }
-        }
-      });
+      // Use 'News' table as specified by user
+      const { data, error } = await supabase
+        .from('News')
+        .insert([
+          {
+            title: String(formData.title).trim(),
+            category: String(formData.category),
+            content: String(formData.description).trim(),
+            image_url: String(formData.imageUrl).trim(),
+            featured: false
+          }
+        ]);
+
+      if (error) throw error;
       
-      alert('✅ Published Successfully! Your news is now live in the ' + formData.category + ' section.');
+      alert('✅ Story Published Successfully to BMBuzz!');
       setFormData({ title: '', category: 'News', imageUrl: '', description: '' });
-    } catch (err) {
-      console.error("Error publishing:", err);
-      alert("Failed to publish news. Check console.");
+    } catch (err: any) {
+      console.error('Supabase Publish Error:', err);
+      alert('❌ Error publishing story: ' + (err.message || 'Unknown database error'));
     } finally {
       setLoading(false);
     }
@@ -191,7 +188,7 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
           <div className="bg-primary/5 p-8 border-b border-gray-100">
             <h2 className="text-3xl font-black text-secondary tracking-tight uppercase flex items-center">
               <span className="w-10 h-1 text-primary mr-4 block"></span>
-              Publish <span className="text-primary ml-2 underline">to Firestore</span>
+              Publish <span className="text-primary ml-2 underline">New Story</span>
             </h2>
           </div>
 
