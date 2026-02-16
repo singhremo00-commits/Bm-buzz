@@ -1,4 +1,3 @@
-
 import { NewsPost, Category, Language } from './types';
 export type { Language };
 
@@ -10,39 +9,45 @@ export const LANGUAGES = [
 
 export const CATEGORY_LABELS: Record<Language, Record<string, string>> = {
   en: {
-    'Home': 'Home', 'News': 'News', 'Music': 'Music', 'Movies': 'Movies', 'Culture': 'Culture', 
-    'Events': 'Events', 'Interviews': 'Interviews', 'Videos': 'Videos', 'Gallery': 'Gallery', 
-    'Talent Showcase': 'Talent Showcase', 'Jobs': 'Jobs'
+    'Home': 'Home', 
+    'Tokta Yaari': 'Tokta Yaari', 
+    'Sanskriti': 'Sanskriti', 
+    'Sahitya': 'Sahitya', 
+    'Events': 'Events'
   },
   bn: {
-    'Home': 'প্রচ্ছদ', 'News': 'খবর', 'Music': 'সংগীত', 'Movies': 'চলচ্চিত্র', 'Culture': 'সংস্কৃতি', 
-    'Events': 'ইভেন্ট', 'Interviews': 'সাক্ষাৎকার', 'Videos': 'ভিডিও', 'Gallery': 'গ্যালারি', 
-    'Talent Showcase': 'প্রতিভা বিকাশ', 'Jobs': 'চাকরি'
+    'Home': 'প্রচ্ছদ', 
+    'Tokta Yaari': 'তক্তা ইয়ারি', 
+    'Sanskriti': 'সংস্কৃতি', 
+    'Sahitya': 'সাহিত্য', 
+    'Events': 'ইভেন্ট'
   },
   hi: {
-    'Home': 'होम', 'News': 'समाचार', 'Music': 'संगीत', 'Movies': 'फिल्में', 'Culture': 'संस्कृति', 
-    'Events': 'आयोजन', 'Interviews': 'साक्षात्कार', 'Videos': 'वीडियो', 'Gallery': 'गैलरी', 
-    'Talent Showcase': 'टैलेंट शोकेस', 'Jobs': 'नौकरियां'
+    'Home': 'होम', 
+    'Tokta Yaari': 'समाचार', 
+    'Sanskriti': 'संस्कृति', 
+    'Sahitya': 'साहित्य', 
+    'Events': 'आयोजन'
   }
 };
 
 export const CATEGORIES: Category[] = [
-  'Home', 'News', 'Music', 'Movies', 'Culture', 'Events', 'Interviews', 'Videos', 'Gallery', 'Talent Showcase', 'Jobs'
-];
+  'Home', 'Tokta Yaari', 'Sanskriti', 'Sahitya', 'Events'
+] as any;
 
 export const BREAKING_NEWS: Record<Language, string[]> = {
   en: [
-    "Official: 'Banar Moynago' confirmed for 2025 end release featuring Shyam Daa.",
+    "Official: 'Banar Moynago' confirmed for 2025 end release.",
     "Bishnupriya Literature Festival to be held in Guwahati this December.",
     "New scholarship announced for Bishnupriya students."
   ],
   bn: [
-    "অফিসিয়াল: শ্যাম দা-র কণ্ঠে 'বানার ময়নাগো' গানটি ২০২৫-এর শেষে মুক্তি পাচ্ছে।",
+    "অফিসিয়াল: 'বানার ময়নাগো' গানটি ২০২৫-এর শেষে মুক্তি পাচ্ছে।",
     "এই ডিসেম্বরে গুয়াহাটিতে বিষ্ণুপ্রিয়া সাহিত্য উৎসব অনুষ্ঠিত হবে।",
     "বিষ্ণুপ্রিয়া ছাত্রদের জন্য নতুন স্কলারশিপ ঘোষণা করা হয়েছে।"
   ],
   hi: [
-    "आधिकारिक: श्याम दा के साथ 'बनार मयनागो' 2025 के अंत में रिलीज होगी।",
+    "आधिकारिक: 'बनार मयनागो' 2025 के अंत में रिलीज होगी।",
     "इस दिसंबर में गुवाहाटी में विष्णुप्रिया साहित्य महोत्सव आयोजित किया जाएगा।",
     "विष्णुप्रिया छात्रों के लिए नई छात्रवृत्ति की घोषणा की गई है।"
   ]
@@ -111,7 +116,7 @@ export const TRANSLATIONS: Record<Language, any> = {
 export const MOCK_NEWS: NewsPost[] = [
   {
     id: '7',
-    category: 'Music',
+    category: 'Tokta Yaari',
     author: 'Deepankar Jain',
     date: 'Oct 24, 2025',
     image: 'https://images.unsplash.com/photo-1514525253361-bee8718a7439?auto=format&fit=crop&q=80&w=1200',
@@ -119,17 +124,17 @@ export const MOCK_NEWS: NewsPost[] = [
     translations: {
       en: {
         title: "The 8-Year Journey of 'Banar Moynago': A Masterpiece Matured Through Time",
-        excerpt: "From a 2017 composition to a 2025 official release with Shyam Daa, 'Banar Moynago' is more than just a song.",
+        excerpt: "From a 2017 composition to a 2025 official release, 'Banar Moynago' is more than just a song.",
         content: `<h2>The Genesis</h2><p>The journey began in 2017... (Full English Article Content)</p>`
       },
       bn: {
         title: "'বানার ময়নাগো'-র ৮ বছরের যাত্রা: সময়ের সাথে পরিপক্ক এক মাস্টারপিস",
-        excerpt: "২০১৭ সালের সুর থেকে ২০২৫-এ শ্যাম দা-র কণ্ঠে অফিসিয়াল রিলিজ, 'বানার ময়নাগো' কেবল একটি গান নয়—এটি একটি আবেগ।",
+        excerpt: "২০১৭ সালের সুর থেকে ২০২৫-এ অফিসিয়াল রিলিজ, 'বানার ময়নাগো' কেবল একটি গান নয়—এটি একটি আবেগ।",
         content: `<h2>সূচনা</h2><p>২০১৭ সালে এই গানের যাত্রা শুরু হয়... (সম্পূর্ণ নিবন্ধ)</p>`
       },
       hi: {
         title: "'बनार मयनागो' की 8 साल की यात्रा: समय के साथ परिपक्व हुई एक उत्कृष्ट कृति",
-        excerpt: "2017 की रचना से लेकर 2025 में श्याम दा के साथ आधिकारिक रिलीज तक, 'बनार मयनागो' सिर्फ एक गाना नहीं है।",
+        excerpt: "2017 की रचना से लेकर 2025 में आधिकारिक रिलीज तक, 'बनार मयनागो' सिर्फ एक गाना नहीं है।",
         content: `<h2>उत्पत्ति</h2><p>यह यात्रा 2017 में शुरू हुई थी... (पूरा लेख)</p>`
       }
     }
@@ -161,7 +166,7 @@ export const MOCK_NEWS: NewsPost[] = [
   },
   {
     id: '2',
-    category: 'Culture',
+    category: 'Sanskriti',
     author: 'Rina Sinha',
     date: 'Oct 22, 2025',
     image: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&q=80&w=800',
@@ -185,7 +190,7 @@ export const MOCK_NEWS: NewsPost[] = [
   },
   {
     id: '3',
-    category: 'Movies',
+    category: 'Sahitya',
     author: 'Karan Sharma',
     date: 'Oct 21, 2025',
     image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=800',

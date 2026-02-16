@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { CATEGORIES, CATEGORY_LABELS, LANGUAGES, Language, TRANSLATIONS } from '../constants';
-import { Menu, X, ChevronDown, Globe } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
 
 interface HeaderProps {
   onCategoryClick: (cat: string) => void;
@@ -14,6 +13,9 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const t = TRANSLATIONS[currentLang];
   const labels = CATEGORY_LABELS[currentLang];
+
+  // Specific menu items as requested: Home, Tokta Yaari, Sanskriti, Sahitya, Events
+  const menuItems = CATEGORIES;
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-md border-b border-gray-100 font-sans">
@@ -49,34 +51,17 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
           </h1>
         </div>
 
-        <ul className="hidden lg:flex items-center space-x-6">
-          {CATEGORIES.slice(0, 8).map((cat) => (
+        <ul className="hidden lg:flex items-center space-x-8">
+          {menuItems.map((cat) => (
             <li key={cat}>
               <button
                 onClick={() => onCategoryClick(cat)}
-                className="text-sm font-bold uppercase text-gray-700 hover:text-primary transition-colors"
+                className="text-sm font-bold uppercase text-gray-700 hover:text-primary transition-colors tracking-tight"
               >
                 {labels[cat] || cat}
               </button>
             </li>
           ))}
-          <li className="relative group">
-            <button className="text-sm font-bold uppercase text-gray-700 hover:text-primary flex items-center">
-              {t.more} <ChevronDown size={14} className="ml-1" />
-            </button>
-            <ul className="absolute right-0 top-full bg-white shadow-xl py-2 w-48 hidden group-hover:block border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
-              {CATEGORIES.slice(8).map((cat) => (
-                <li key={cat}>
-                  <button
-                    onClick={() => onCategoryClick(cat)}
-                    className="w-full text-left px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-primary"
-                  >
-                    {labels[cat] || cat}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </li>
         </ul>
 
         <button className="lg:hidden p-2 text-gray-700" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -87,7 +72,7 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
       {isMenuOpen && (
         <div className="lg:hidden bg-white border-t border-gray-100 py-4 absolute w-full left-0 shadow-xl max-h-[80vh] overflow-y-auto z-50">
           <ul className="flex flex-col px-6 space-y-4">
-            {CATEGORIES.map((cat) => (
+            {menuItems.map((cat) => (
               <li key={cat}>
                 <button
                   onClick={() => {

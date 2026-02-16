@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Language, TRANSLATIONS } from './constants';
 import { Lock, FileText, Image as ImageIcon, Tag, Send, ArrowLeft, LogOut, LayoutDashboard } from 'lucide-react';
@@ -135,7 +134,7 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
                 required
                 value={formData.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
-                placeholder="e.g. Shyam Daa announces new world tour..."
+                placeholder="Enter headline..."
                 className="w-full px-0 py-4 text-2xl font-serif border-b-2 border-gray-100 focus:border-primary focus:outline-none transition-all placeholder:text-gray-200"
               />
             </div>
@@ -151,6 +150,7 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
                   className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-black text-gray-700 appearance-none cursor-pointer"
                 >
+                  <option value="Home">Home</option>
                   <option value="Tokta Yaari">Tokta Yaari (News)</option>
                   <option value="Sanskriti">Sanskriti (Culture)</option>
                   <option value="Sahitya">Sahitya (Literature)</option>
