@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import NewsTicker from './components/NewsTicker';
@@ -14,25 +13,48 @@ const App: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
   const [language, setLanguage] = useState<Language>('en');
 
+  // Sync state with URL path for manual /admin access
+  useEffect(() => {
+    const handleLocationChange = () => {
+      const path = window.location.pathname;
+      if (path === '/admin') {
+        setActivePage('Admin');
+      } else if (path === '/') {
+        setActivePage('Home');
+      }
+    };
+
+    // Check on initial load
+    handleLocationChange();
+
+    // Listen for popstate (back/forward browser buttons)
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
+  const navigateTo = (page: 'Home' | 'Category' | 'Post' | 'Admin', path: string = '/') => {
+    window.history.pushState({}, '', path);
+    setActivePage(page);
+    window.scrollTo(0, 0);
+  };
+
   const t = TRANSLATIONS[language];
   const labels = CATEGORY_LABELS[language];
 
   const handleCategoryClick = (cat: string) => {
-    window.scrollTo(0, 0);
     if (cat === 'Home') {
-      setActivePage('Home');
+      navigateTo('Home', '/');
     } else {
       setSelectedCategory(cat);
-      setActivePage('Category');
+      navigateTo('Category', `/${cat.toLowerCase().replace(/\s+/g, '-')}`);
     }
   };
 
   const handlePostClick = (id: string) => {
-    window.scrollTo(0, 0);
     const post = MOCK_NEWS.find(p => p.id === id);
     if (post) {
       setSelectedPost(post);
-      setActivePage('Post');
+      navigateTo('Post', `/post/${id}`);
     }
   };
 
@@ -52,7 +74,7 @@ const App: React.FC = () => {
     <div className={`min-h-screen flex flex-col font-sans selection:bg-primary selection:text-white ${language === 'bn' || language === 'hi' ? 'leading-relaxed' : ''}`}>
       <Header 
         onCategoryClick={handleCategoryClick} 
-        onLogoClick={() => setActivePage('Home')} 
+        onLogoClick={() => navigateTo('Home', '/')} 
         currentLang={language}
         onLanguageChange={handleLanguageChange}
       />
@@ -116,7 +138,7 @@ const App: React.FC = () => {
             {activePage === 'Category' && (
               <div>
                 <nav className="flex text-[10px] text-gray-500 mb-6 font-black uppercase tracking-[0.2em]">
-                  <span className="cursor-pointer hover:text-primary" onClick={() => setActivePage('Home')}>{t.backHome}</span>
+                  <span className="cursor-pointer hover:text-primary" onClick={() => navigateTo('Home', '/')}>{t.backHome}</span>
                   <span className="mx-2">/</span>
                   <span className="text-primary">{labels[selectedCategory] || selectedCategory}</span>
                 </nav>
@@ -173,7 +195,7 @@ const App: React.FC = () => {
             })()}
 
             {activePage === 'Admin' && (
-              <Admin currentLang={language} onBack={() => setActivePage('Home')} />
+              <Admin currentLang={language} onBack={() => navigateTo('Home', '/')} />
             )}
           </div>
 
@@ -186,7 +208,7 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      <Footer onAdminClick={() => setActivePage('Admin')} currentLang={language} />
+      <Footer currentLang={language} />
       
       <style>{`
         .article-content h2 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 2.25rem; margin: 2.5rem 0 1.25rem; color: #111827; }
