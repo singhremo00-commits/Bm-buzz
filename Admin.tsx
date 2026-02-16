@@ -40,7 +40,7 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
   const [formData, setFormData] = useState({
     title: '',
     category: 'News',
-    imageUrl: '', // Existing URL for edits
+    imageUrl: '', 
     description: ''
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -56,7 +56,6 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
       if (fetchError) throw fetchError;
       setNewsList(data || []);
     } catch (err: any) {
-      // Clean error logging to avoid circular structures
       console.error('Fetch Error:', err.message || 'Unknown error');
     }
   }, []);
@@ -86,7 +85,6 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedFile(file);
-      // Clean up previous preview URL to avoid memory leaks
       if (previewUrl && !previewUrl.startsWith('http')) {
         URL.revokeObjectURL(previewUrl);
       }
@@ -190,12 +188,10 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
     try {
       let finalImageUrl = formData.imageUrl;
 
-      // Mandatory upload for new posts if no file is picked
       if (!editingId && !selectedFile) {
         throw new Error("Please pick a photo from your gallery.");
       }
 
-      // If a new file is picked, upload it and get the public URL
       if (selectedFile) {
         finalImageUrl = await handleUpload(selectedFile);
       }
@@ -234,7 +230,6 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
     }
   };
 
-  // Combining categories for the dropdown
   const allTargetSections = [...GENERAL_CATEGORIES, ...REGIONAL_CATEGORIES].filter(c => c !== 'Home');
 
   if (!isAuthenticated) {
@@ -289,7 +284,6 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
           </div>
 
           <form onSubmit={handleSubmit} className="p-10 space-y-10">
-            {/* Headline */}
             <div className="space-y-3">
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center"><FileText size={14} className="mr-2 text-primary" /> News Headline</label>
               <input
@@ -303,7 +297,6 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              {/* Category Dropdown */}
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center"><Tag size={14} className="mr-2 text-primary" /> Target Section</label>
                 <select
@@ -317,12 +310,12 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
                 </select>
               </div>
 
-              {/* Image File Pick */}
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center"><ImageIcon size={14} className="mr-2 text-primary" /> Choose News Photo</label>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
                     <input 
+                      id="fileInput"
                       ref={fileInputRef}
                       type="file" 
                       accept="image/*" 
@@ -340,7 +333,6 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
               </div>
             </div>
 
-            {/* Story Content */}
             <div className="space-y-3">
               <div className="flex items-center justify-between mb-2">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center"><FileText size={14} className="mr-2 text-primary" /> Full Story Body</label>
@@ -361,7 +353,6 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
               />
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
@@ -373,7 +364,6 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
           </form>
         </div>
 
-        {/* List Section */}
         <div className="mt-16 space-y-6">
           <h3 className="text-2xl font-black uppercase tracking-tighter border-b-2 border-primary pb-2">Recent Submissions ({newsList.length})</h3>
           <div className="grid grid-cols-1 gap-4">

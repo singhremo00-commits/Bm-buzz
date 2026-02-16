@@ -32,7 +32,7 @@ export type Category =
   | 'Talents' 
   | 'Jobs'
   | 'Silchar'
-  | 'Manipur'
+  | 'Manipuri'
   | 'Hingala'
   | 'Baronuni'
   | 'Bangladesh'

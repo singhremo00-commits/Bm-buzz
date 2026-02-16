@@ -8,7 +8,7 @@ export const LANGUAGES = [
 ];
 
 export const REGIONAL_CATEGORIES: Category[] = [
-  'Silchar', 'Manipur', 'Hingala', 'Baronuni', 'Bangladesh', 'Tripura', 'Bikrampur', 'Patharkandi', 'Guwahati'
+  'Silchar', 'Manipuri', 'Hingala', 'Baronuni', 'Bangladesh', 'Tripura', 'Bikrampur', 'Patharkandi', 'Guwahati'
 ];
 
 export const GENERAL_CATEGORIES: Category[] = [
@@ -33,7 +33,7 @@ export const CATEGORY_LABELS: Record<Language, Record<string, string>> = {
     'Talents': 'Talents',
     'Jobs': 'Jobs',
     'Silchar': 'Silchar',
-    'Manipur': 'Manipur',
+    'Manipuri': 'Manipuri',
     'Hingala': 'Hingala',
     'Baronuni': 'Baronuni',
     'Bangladesh': 'Bangladesh',
@@ -55,7 +55,7 @@ export const CATEGORY_LABELS: Record<Language, Record<string, string>> = {
     'Talents': 'প্রতিভা',
     'Jobs': 'চাকরি',
     'Silchar': 'শিলচর',
-    'Manipur': 'মণিপুর',
+    'Manipuri': 'মণিপুর',
     'Hingala': 'হিঙ্গলা',
     'Baronuni': 'বরুনী',
     'Bangladesh': 'বাংলাদেশ',
@@ -77,7 +77,7 @@ export const CATEGORY_LABELS: Record<Language, Record<string, string>> = {
     'Talents': 'प्रतिभा',
     'Jobs': 'नौकरियां',
     'Silchar': 'सिलचर',
-    'Manipur': 'मणिपुर',
+    'Manipuri': 'मणिपुरी',
     'Hingala': 'हिंगला',
     'Baronuni': 'बरोनी',
     'Bangladesh': 'बांग्लादेश',
