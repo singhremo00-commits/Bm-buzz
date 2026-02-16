@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Language, TRANSLATIONS, CATEGORIES, CATEGORY_LABELS } from './constants';
 import { 
@@ -7,7 +6,6 @@ import {
   Image as ImageIcon, 
   Tag, 
   Send, 
-  ArrowLeft, 
   LogOut, 
   LayoutDashboard, 
   Globe, 
@@ -15,17 +13,20 @@ import {
   Bold, 
   Italic 
 } from 'lucide-react';
+import { db } from './firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 interface AdminProps {
   currentLang: Language;
   onBack: () => void;
-  onPublish: (data: any) => void;
+  onPublish?: (data: any) => void;
 }
 
-const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
+const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   // Form State
@@ -63,7 +64,7 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
     let processedTags = startTag;
     if (startTag.includes('href=""')) {
       const url = prompt("Enter the URL (e.g., https://google.com):", "https://");
-      if (url === null) return; // Cancelled
+      if (url === null) return; 
       processedTags = startTag.replace('href=""', `href="${url}" target="_blank" class="text-primary underline font-bold"`);
     }
 
@@ -73,7 +74,6 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
 
     setFormData({ ...formData, description: newText });
     
-    // Set focus back and adjust selection
     setTimeout(() => {
       el.focus();
       const newCursorPos = start + processedTags.length + selected.length + endTag.length;
@@ -81,17 +81,35 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
     }, 10);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onPublish(formData);
-    alert('✅ Published Successfully! Your post is now live in the ' + formData.category + ' section.');
-    // Reset form
-    setFormData({
-      title: '',
-      category: 'News',
-      imageUrl: '',
-      description: ''
-    });
+    setLoading(true);
+    try {
+      // Save to Firestore 'news' collection
+      await addDoc(collection(db, "news"), {
+        title: formData.title,
+        category: formData.category,
+        content: formData.description,
+        imageUrl: formData.imageUrl,
+        author: 'Admin',
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        timestamp: serverTimestamp(),
+        // Simple translation wrap for app compatibility
+        translations: {
+          en: { title: formData.title, excerpt: formData.description.substring(0, 150) + '...', content: formData.description },
+          bn: { title: formData.title, excerpt: formData.description.substring(0, 150) + '...', content: formData.description },
+          hi: { title: formData.title, excerpt: formData.description.substring(0, 150) + '...', content: formData.description }
+        }
+      });
+      
+      alert('✅ Published Successfully! Your news is now live in the ' + formData.category + ' section.');
+      setFormData({ title: '', category: 'News', imageUrl: '', description: '' });
+    } catch (err) {
+      console.error("Error publishing:", err);
+      alert("Failed to publish news. Check console.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isAuthenticated) {
@@ -141,7 +159,6 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
 
   return (
     <div className="min-h-screen bg-gray-50 -mt-8 -mx-4">
-      {/* Admin Header */}
       <header className="bg-black text-white p-6 shadow-2xl flex items-center justify-between sticky top-0 z-50 border-b-4 border-primary">
         <div className="flex items-center space-x-4">
           <div className="bg-primary p-2 rounded-lg">
@@ -174,12 +191,11 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
           <div className="bg-primary/5 p-8 border-b border-gray-100">
             <h2 className="text-3xl font-black text-secondary tracking-tight uppercase flex items-center">
               <span className="w-10 h-1 text-primary mr-4 block"></span>
-              Publish <span className="text-primary ml-2 underline">New Content</span>
+              Publish <span className="text-primary ml-2 underline">to Firestore</span>
             </h2>
           </div>
 
           <form onSubmit={handleSubmit} className="p-10 space-y-10">
-            {/* Title */}
             <div className="space-y-3">
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center">
                 <FileText size={14} className="mr-2 text-primary" /> News Headline
@@ -189,13 +205,12 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
                 required
                 value={formData.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
-                placeholder="Enter an eye-catching headline..."
+                placeholder="Enter headline..."
                 className="w-full px-0 py-4 text-2xl font-serif border-b-2 border-gray-100 focus:border-primary focus:outline-none transition-all placeholder:text-gray-200"
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              {/* Category */}
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center">
                   <Tag size={14} className="mr-2 text-primary" /> Target Section
@@ -207,66 +222,37 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
                     className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-black text-gray-700 appearance-none cursor-pointer"
                   >
                     {CATEGORIES.map(cat => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
+                      <option key={cat} value={cat}>{cat}</option>
                     ))}
                   </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                    ▼
-                  </div>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">▼</div>
                 </div>
               </div>
 
-              {/* Image URL */}
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center">
-                  <ImageIcon size={14} className="mr-2 text-primary" /> Feature Image (Direct URL)
+                  <ImageIcon size={14} className="mr-2 text-primary" /> Feature Image URL
                 </label>
                 <input
                   type="url"
                   required
                   value={formData.imageUrl}
                   onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="https://..."
                   className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-600"
                 />
               </div>
             </div>
 
-            {/* Content */}
             <div className="space-y-3">
               <div className="flex items-center justify-between mb-2">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center">
-                  <FileText size={14} className="mr-2 text-primary" /> Detailed Story / Article Body
+                  <FileText size={14} className="mr-2 text-primary" /> Full Story
                 </label>
-                {/* Toolbar */}
-                <div className="flex bg-gray-100 rounded-lg p-1 space-x-1 shadow-inner border border-gray-200">
-                  <button 
-                    type="button" 
-                    onClick={() => applyTag('<b>', '</b>')}
-                    className="p-1.5 hover:bg-white rounded transition-colors text-gray-600 hover:text-black shadow-sm"
-                    title="Bold"
-                  >
-                    <Bold size={14} />
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={() => applyTag('<i>', '</i>')}
-                    className="p-1.5 hover:bg-white rounded transition-colors text-gray-600 hover:text-black shadow-sm"
-                    title="Italic"
-                  >
-                    <Italic size={14} />
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={() => applyTag('<a href="">', '</a>')}
-                    className="p-1.5 hover:bg-primary hover:text-white rounded transition-colors text-gray-600 shadow-sm flex items-center space-x-1 px-2"
-                    title="Add Link"
-                  >
-                    <LinkIcon size={14} />
-                    <span className="text-[9px] font-black uppercase tracking-widest">Link</span>
-                  </button>
+                <div className="flex bg-gray-100 rounded-lg p-1 space-x-1 border border-gray-200">
+                  <button type="button" onClick={() => applyTag('<b>', '</b>')} className="p-1.5 hover:bg-white rounded transition-colors" title="Bold"><Bold size={14} /></button>
+                  <button type="button" onClick={() => applyTag('<i>', '</i>')} className="p-1.5 hover:bg-white rounded transition-colors" title="Italic"><Italic size={14} /></button>
+                  <button type="button" onClick={() => applyTag('<a href="">', '</a>')} className="p-1.5 hover:bg-primary hover:text-white rounded transition-colors flex items-center space-x-1 px-2" title="Add Link"><LinkIcon size={14} /><span className="text-[9px] font-black uppercase">Link</span></button>
                 </div>
               </div>
               <textarea
@@ -275,26 +261,23 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
                 rows={10}
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Select any word and click the toolbar icons to format..."
-                className="w-full px-6 py-6 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-sans leading-relaxed text-gray-700 shadow-inner"
+                placeholder="Tell the story..."
+                className="w-full px-6 py-6 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-gray-700 shadow-inner"
               />
             </div>
 
             <div className="pt-6">
               <button
                 type="submit"
+                disabled={loading}
                 className="w-full md:w-auto px-16 py-5 bg-black hover:bg-primary text-white font-black uppercase tracking-[0.3em] rounded-2xl shadow-2xl transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center space-x-4 text-sm group"
               >
-                <Send size={20} className="group-hover:rotate-12 transition-transform" />
-                <span>Publish to BMBuzz</span>
+                {loading ? <span className="animate-spin">🌀</span> : <Send size={20} />}
+                <span>{loading ? 'Publishing...' : 'Publish to BMBuzz'}</span>
               </button>
             </div>
           </form>
         </div>
-        
-        <p className="text-center text-gray-400 text-[10px] font-bold uppercase tracking-[0.5em] mt-12 opacity-50">
-          Administrator Console &copy; 2026 BM BUZZ
-        </p>
       </div>
     </div>
   );

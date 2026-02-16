@@ -1,23 +1,35 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import NewsTicker from './components/NewsTicker';
 import Sidebar from './components/Sidebar';
 import Admin from './Admin';
-import { MOCK_NEWS, CATEGORIES, CATEGORY_LABELS, TRANSLATIONS, Language } from './constants';
+import { CATEGORIES, CATEGORY_LABELS, TRANSLATIONS, Language } from './constants';
 import { NewsPost } from './types';
+import { db } from './firebase';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<'Home' | 'Category' | 'Post' | 'Admin'>('Home');
   const [selectedCategory, setSelectedCategory] = useState('Home');
   const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
   const [language, setLanguage] = useState<Language>('en');
-  
-  // Use state to manage news so 'publishing' works in current session
-  const [allNews, setAllNews] = useState<NewsPost[]>(MOCK_NEWS);
+  const [allNews, setAllNews] = useState<NewsPost[]>([]);
 
-  // Sync state with URL path for manual /admin access
+  // Real-time news fetch from Firestore
+  useEffect(() => {
+    const q = query(collection(db, "news"), orderBy("timestamp", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const newsData: NewsPost[] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as NewsPost[];
+      setAllNews(newsData);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   useEffect(() => {
     const handleLocationChange = () => {
       const path = window.location.pathname;
@@ -27,7 +39,6 @@ const App: React.FC = () => {
         setActivePage('Home');
       }
     };
-
     handleLocationChange();
     window.addEventListener('popstate', handleLocationChange);
     return () => window.removeEventListener('popstate', handleLocationChange);
@@ -59,35 +70,6 @@ const App: React.FC = () => {
     }
   };
 
-  const handlePublish = (newPostData: any) => {
-    const newPost: NewsPost = {
-      id: Date.now().toString(),
-      category: newPostData.category,
-      author: 'Admin',
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      image: newPostData.imageUrl,
-      translations: {
-        en: {
-          title: newPostData.title,
-          excerpt: newPostData.description.substring(0, 150) + '...',
-          content: newPostData.description
-        },
-        bn: {
-          title: newPostData.title,
-          excerpt: newPostData.description.substring(0, 150) + '...',
-          content: newPostData.description
-        },
-        hi: {
-          title: newPostData.title,
-          excerpt: newPostData.description.substring(0, 150) + '...',
-          content: newPostData.description
-        }
-      }
-    };
-    
-    setAllNews([newPost, ...allNews]);
-  };
-
   const handleLanguageChange = (lang: Language) => {
     setLanguage(lang);
   };
@@ -97,8 +79,7 @@ const App: React.FC = () => {
   };
 
   const featuredPost = allNews.find(p => p.featured) || allNews[0];
-  const sortedNews = [...allNews].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  const otherNews = sortedNews.filter(p => p.id !== featuredPost?.id);
+  const otherNews = allNews.filter(p => p.id !== featuredPost?.id);
 
   return (
     <div className={`min-h-screen flex flex-col font-sans selection:bg-primary selection:text-white ${language === 'bn' || language === 'hi' ? 'leading-relaxed' : ''}`}>
@@ -117,12 +98,12 @@ const App: React.FC = () => {
           <div className={activePage === 'Admin' ? 'lg:col-span-1' : 'lg:col-span-8'}>
             {activePage === 'Home' && (
               <div className="space-y-12">
-                {featuredPost && (() => {
+                {featuredPost ? (() => {
                   const info = getPostInfo(featuredPost);
                   return (
                     <section className="relative group cursor-pointer overflow-hidden rounded-sm shadow-2xl" onClick={() => handlePostClick(featuredPost.id)}>
                       <div className="aspect-[16/9] w-full bg-gray-200">
-                        <img src={featuredPost.image} alt={info.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        <img src={featuredPost.image || (featuredPost as any).imageUrl} alt={info.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                       </div>
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
                       <div className="absolute bottom-0 left-0 p-6 md:p-10 text-white max-w-2xl">
@@ -134,7 +115,11 @@ const App: React.FC = () => {
                       </div>
                     </section>
                   );
-                })()}
+                })() : (
+                  <div className="h-64 flex items-center justify-center text-gray-400 font-bold uppercase tracking-widest bg-white rounded shadow">
+                    Loading latest news...
+                  </div>
+                )}
 
                 <section>
                   <div className="flex items-center justify-between mb-8 border-b-2 border-primary pb-2">
@@ -146,7 +131,7 @@ const App: React.FC = () => {
                       return (
                         <article key={post.id} className="flex flex-col cursor-pointer group" onClick={() => handlePostClick(post.id)}>
                           <div className="aspect-[3/2] overflow-hidden rounded-sm mb-4 bg-gray-100 shadow-sm">
-                            <img src={post.image} alt={info.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                            <img src={post.image || (post as any).imageUrl} alt={info.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                           </div>
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-[10px] font-black text-primary uppercase tracking-widest">{labels[post.category] || post.category}</span>
@@ -179,7 +164,7 @@ const App: React.FC = () => {
                       return (
                         <article key={post.id} className="flex flex-col md:flex-row gap-8 cursor-pointer group items-center" onClick={() => handlePostClick(post.id)}>
                           <div className="md:w-1/3 aspect-[4/3] overflow-hidden rounded-sm shadow-lg w-full">
-                            <img src={post.image} alt={info.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            <img src={post.image || (post as any).imageUrl} alt={info.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                           </div>
                           <div className="md:w-2/3">
                             <span className="text-[10px] font-black text-primary uppercase mb-2 block tracking-widest">{labels[post.category] || post.category}</span>
@@ -209,13 +194,13 @@ const App: React.FC = () => {
                     <span>{selectedPost.date}</span>
                   </div>
                   <div className="relative mb-12">
-                    <img src={selectedPost.image} alt={info.title} className="w-full rounded-sm shadow-2xl" />
+                    <img src={selectedPost.image || (selectedPost as any).imageUrl} alt={info.title} className="w-full rounded-sm shadow-2xl" />
                     <div className="absolute top-4 left-4 bg-primary text-white text-[10px] font-black px-3 py-1 uppercase tracking-widest shadow-lg">
                       {labels[selectedPost.category] || selectedPost.category} {t.exclusive}
                     </div>
                   </div>
                   <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed font-sans">
-                    <div className="article-content" dangerouslySetInnerHTML={{ __html: info.content }} />
+                    <div className="article-content" dangerouslySetInnerHTML={{ __html: info.content || (selectedPost as any).content }} />
                   </div>
                 </article>
               );
@@ -225,14 +210,13 @@ const App: React.FC = () => {
               <Admin 
                 currentLang={language} 
                 onBack={() => navigateTo('Home', '/')} 
-                onPublish={handlePublish}
               />
             )}
           </div>
 
           {activePage !== 'Admin' && (
             <div className="lg:col-span-4">
-              <Sidebar onPostClick={handlePostClick} currentLang={language} />
+              <Sidebar onPostClick={handlePostClick} currentLang={language} newsData={allNews} />
             </div>
           )}
         </div>

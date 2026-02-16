@@ -1,4 +1,3 @@
-
 // Exporting Language type to be used throughout the application
 export type Language = 'en' | 'bn' | 'hi';
 
@@ -7,6 +6,7 @@ export interface NewsPost {
   category: string;
   author: string;
   date: string;
+  timestamp?: any;
   image: string;
   featured?: boolean;
   trending?: boolean;
@@ -29,5 +29,5 @@ export type Category =
   | 'Interviews' 
   | 'Videos' 
   | 'Gallery' 
-  | 'Talent Showcase' 
+  | 'Talents' 
   | 'Jobs';
