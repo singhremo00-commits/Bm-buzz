@@ -7,6 +7,18 @@ export const LANGUAGES = [
   { code: 'hi', name: 'हिन्दी' }
 ];
 
+export const REGIONAL_CATEGORIES: Category[] = [
+  'Silchar', 'Manipur', 'Hingala', 'Baronuni', 'Bangladesh', 'Tripura', 'Bikrampur', 'Patharkandi', 'Guwahati'
+];
+
+export const GENERAL_CATEGORIES: Category[] = [
+  'News', 'Music', 'Movies', 'Culture', 'Events', 'Interviews', 'Videos', 'Gallery', 'Talents', 'Jobs'
+];
+
+export const CATEGORIES: Category[] = [
+  'Home', ...GENERAL_CATEGORIES, ...REGIONAL_CATEGORIES
+];
+
 export const CATEGORY_LABELS: Record<Language, Record<string, string>> = {
   en: {
     'Home': 'Home', 
@@ -19,7 +31,16 @@ export const CATEGORY_LABELS: Record<Language, Record<string, string>> = {
     'Videos': 'Videos',
     'Gallery': 'Gallery',
     'Talents': 'Talents',
-    'Jobs': 'Jobs'
+    'Jobs': 'Jobs',
+    'Silchar': 'Silchar',
+    'Manipur': 'Manipur',
+    'Hingala': 'Hingala',
+    'Baronuni': 'Baronuni',
+    'Bangladesh': 'Bangladesh',
+    'Tripura': 'Tripura',
+    'Bikrampur': 'Bikrampur',
+    'Patharkandi': 'Patharkandi',
+    'Guwahati': 'Guwahati'
   },
   bn: {
     'Home': 'প্রচ্ছদ', 
@@ -32,7 +53,16 @@ export const CATEGORY_LABELS: Record<Language, Record<string, string>> = {
     'Videos': 'ভিডিও',
     'Gallery': 'গ্যালারি',
     'Talents': 'প্রতিভা',
-    'Jobs': 'চাকরি'
+    'Jobs': 'চাকরি',
+    'Silchar': 'শিলচর',
+    'Manipur': 'মণিপুর',
+    'Hingala': 'হিঙ্গলা',
+    'Baronuni': 'বরুনী',
+    'Bangladesh': 'বাংলাদেশ',
+    'Tripura': 'ত্রিপুরা',
+    'Bikrampur': 'বিক্রমপুর',
+    'Patharkandi': 'পাথারকান্দি',
+    'Guwahati': 'গুয়াহাটি'
   },
   hi: {
     'Home': 'होम', 
@@ -45,13 +75,18 @@ export const CATEGORY_LABELS: Record<Language, Record<string, string>> = {
     'Videos': 'वीडियो',
     'Gallery': 'गैलरी',
     'Talents': 'प्रतिभा',
-    'Jobs': 'नौकरियां'
+    'Jobs': 'नौकरियां',
+    'Silchar': 'सिलचर',
+    'Manipur': 'मणिपुर',
+    'Hingala': 'हिंगला',
+    'Baronuni': 'बरोनी',
+    'Bangladesh': 'बांग्लादेश',
+    'Tripura': 'त्रिपुरा',
+    'Bikrampur': 'बिक्रमपुर',
+    'Patharkandi': 'पाथरकांडी',
+    'Guwahati': 'गुवाहाटी'
   }
 };
-
-export const CATEGORIES: Category[] = [
-  'Home', 'News', 'Music', 'Movies', 'Culture', 'Events', 'Interviews', 'Videos', 'Gallery', 'Talents', 'Jobs'
-];
 
 export const BREAKING_NEWS: Record<Language, string[]> = {
   en: [
@@ -89,7 +124,8 @@ export const TRANSLATIONS: Record<Language, any> = {
     madeIn: "Made in North East India",
     more: "More",
     backHome: "Home",
-    connect: "Stay Connected"
+    connect: "Stay Connected",
+    areas: "Areas"
   },
   bn: {
     voice: "বিষ্ণুপ্রিয়া সম্প্রদায়ের কণ্ঠস্বর",
@@ -108,7 +144,8 @@ export const TRANSLATIONS: Record<Language, any> = {
     madeIn: "উত্তর-পূর্ব ভারতে তৈরি",
     more: "আরও",
     backHome: "হোম",
-    connect: "সাথে থাকুন"
+    connect: "সাথে থাকুন",
+    areas: "অঞ্চল"
   },
   hi: {
     voice: "विष्णुप्रिया समुदाय की आवाज़",
@@ -127,7 +164,8 @@ export const TRANSLATIONS: Record<Language, any> = {
     madeIn: "उत्तर पूर्व भारत में निर्मित",
     more: "अधिक",
     backHome: "होम",
-    connect: "जुड़े रहें"
+    connect: "जुड़े रहें",
+    areas: "क्षेत्र"
   }
 };
 

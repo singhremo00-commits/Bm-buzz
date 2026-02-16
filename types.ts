@@ -30,4 +30,13 @@ export type Category =
   | 'Videos' 
   | 'Gallery' 
   | 'Talents' 
-  | 'Jobs';
+  | 'Jobs'
+  | 'Silchar'
+  | 'Manipur'
+  | 'Hingala'
+  | 'Baronuni'
+  | 'Bangladesh'
+  | 'Tripura'
+  | 'Bikrampur'
+  | 'Patharkandi'
+  | 'Guwahati';
