@@ -4,12 +4,13 @@ import Footer from './components/Footer';
 import NewsTicker from './components/NewsTicker';
 import Sidebar from './components/Sidebar';
 import Admin from './Admin';
+import About from './components/About';
 import { CATEGORIES, CATEGORY_LABELS, TRANSLATIONS, Language, MOCK_NEWS } from './constants';
 import { NewsPost } from './types';
 import { supabase } from './supabaseClient';
 
 const App: React.FC = () => {
-  const [activePage, setActivePage] = useState<'Home' | 'Category' | 'Post' | 'Admin'>('Home');
+  const [activePage, setActivePage] = useState<'Home' | 'Category' | 'Post' | 'Admin' | 'About'>('Home');
   const [selectedCategory, setSelectedCategory] = useState('Home');
   const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
   const [language, setLanguage] = useState<Language>('en');
@@ -19,7 +20,6 @@ const App: React.FC = () => {
   const fetchNews = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Fetching from strictly named 'News' table
       const { data, error } = await supabase
         .from('News')
         .select('*')
@@ -32,7 +32,6 @@ const App: React.FC = () => {
       }
 
       if (data && data.length > 0) {
-        // Constructing clean, serializable data objects to avoid "Circular Structure" errors
         const mappedNews: NewsPost[] = data.map((item: any) => {
           const titleStr = String(item.title || 'Untitled Story');
           const contentStr = String(item.content || '');
@@ -73,6 +72,8 @@ const App: React.FC = () => {
       const path = window.location.pathname;
       if (path === '/admin') {
         setActivePage('Admin');
+      } else if (path === '/about') {
+        setActivePage('About');
       } else if (path === '/') {
         setActivePage('Home');
         fetchNews();
@@ -80,13 +81,12 @@ const App: React.FC = () => {
     };
 
     window.addEventListener('popstate', handleLocationChange);
-    // Initial check
     handleLocationChange();
     
     return () => window.removeEventListener('popstate', handleLocationChange);
   }, [fetchNews]);
 
-  const navigateTo = (page: 'Home' | 'Category' | 'Post' | 'Admin', path: string = '/') => {
+  const navigateTo = (page: 'Home' | 'Category' | 'Post' | 'Admin' | 'About', path: string = '/') => {
     window.history.pushState({}, '', path);
     setActivePage(page);
     window.scrollTo(0, 0);
@@ -135,16 +135,16 @@ const App: React.FC = () => {
       {activePage !== 'Admin' && <NewsTicker currentLang={language} />}
 
       <main className="flex-grow container mx-auto px-4 py-8">
-        {isLoading && activePage !== 'Admin' && (
+        {isLoading && activePage !== 'Admin' && activePage !== 'About' && (
           <div className="flex flex-col items-center justify-center py-24">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4"></div>
             <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-[10px]">Loading BMBuzz Feed...</p>
           </div>
         )}
 
-        <div className={`grid grid-cols-1 ${activePage === 'Admin' ? '' : 'lg:grid-cols-12'} gap-10`}>
+        <div className={`grid grid-cols-1 ${activePage === 'Admin' || activePage === 'About' ? '' : 'lg:grid-cols-12'} gap-10`}>
           
-          <div className={activePage === 'Admin' ? 'w-full' : 'lg:col-span-8'}>
+          <div className={activePage === 'Admin' || activePage === 'About' ? 'w-full' : 'lg:col-span-8'}>
             {activePage === 'Home' && !isLoading && (
               <div className="space-y-12">
                 {featuredPost ? (() => {
@@ -254,9 +254,10 @@ const App: React.FC = () => {
             })()}
 
             {activePage === 'Admin' && <Admin currentLang={language} onBack={() => navigateTo('Home', '/')} />}
+            {activePage === 'About' && <About />}
           </div>
 
-          {activePage !== 'Admin' && (
+          {activePage !== 'Admin' && activePage !== 'About' && (
             <div className="lg:col-span-4">
               <Sidebar onPostClick={handlePostClick} currentLang={language} newsData={allNews} />
             </div>
