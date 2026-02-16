@@ -1,6 +1,5 @@
 import React from 'react';
 import { Language, TRANSLATIONS, CATEGORY_LABELS } from '../constants';
-// Added Star to the lucide-react imports
 import { TrendingUp, Clock, Mail, Facebook, Twitter, Instagram, Youtube, Star } from 'lucide-react';
 import { NewsPost } from '../types';
 
@@ -52,12 +51,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onPostClick, currentLang, newsData })
             return (
               <div key={post.id} className="flex items-center space-x-5 cursor-pointer group" onClick={() => onPostClick(post.id)}>
                 <div className="flex-shrink-0 w-20 h-20 bg-gray-200 relative overflow-hidden rounded-xl shadow-sm">
-                  <img src={post.image || (post as any).imageUrl} alt={info.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <img src={post.image} alt={info.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   <span className="absolute top-0 left-0 bg-primary text-white text-[10px] px-2 py-0.5 font-black rounded-br-lg shadow-md">0{i + 1}</span>
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[10px] font-black text-primary uppercase mb-2 block tracking-widest">{labels[post.category] || post.category}</span>
-                  <h4 className="text-sm font-extrabold font-title leading-tight text-secondary group-hover:text-primary transition-colors line-clamp-2 tracking-tight">{info.title}</h4>
+                  <span className="text-[10px] font-black text-primary uppercase mb-1 block tracking-widest">{labels[post.category] || post.category}</span>
+                  <h4 className="text-sm font-semibold font-title leading-tight text-secondary group-hover:text-primary transition-colors line-clamp-2 tracking-tight">{info.title}</h4>
                 </div>
               </div>
             );
@@ -77,11 +76,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onPostClick, currentLang, newsData })
             const info = post.translations[currentLang] || post.translations.en;
             return (
               <div key={`recent-${post.id}`} className="group cursor-pointer border-b border-gray-100 pb-5 last:border-0" onClick={() => onPostClick(post.id)}>
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{labels[post.category] || post.category}</span>
                   <span className="text-[9px] font-bold text-gray-400 uppercase">{post.date}</span>
                 </div>
-                <h4 className="text-sm font-extrabold font-title leading-snug text-secondary group-hover:text-primary transition-colors line-clamp-2 tracking-tight">{info.title}</h4>
+                <h4 className="text-sm font-semibold font-title leading-snug text-secondary group-hover:text-primary transition-colors line-clamp-2 tracking-tight">{info.title}</h4>
               </div>
             );
           })}

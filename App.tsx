@@ -159,7 +159,7 @@ const App: React.FC = () => {
                         <span className="bg-primary text-white text-[8px] font-black px-2 py-0.5 uppercase rounded-sm mb-1 inline-block tracking-[0.15em]">
                           {labels[featuredPost.category] || featuredPost.category}
                         </span>
-                        <h2 className="text-xl md:text-2xl font-bold font-title tracking-tight leading-tight mb-1 group-hover:underline decoration-primary">
+                        <h2 className="text-xl md:text-2xl font-semibold font-title tracking-tight leading-tight mb-1 group-hover:underline decoration-primary">
                           {info.title}
                         </h2>
                         <div className="flex items-center space-x-3 mb-2 text-[9px] font-bold uppercase tracking-wider text-gray-300 opacity-80">
@@ -188,7 +188,7 @@ const App: React.FC = () => {
                               <span className="text-[8px] font-black text-primary uppercase tracking-widest">{labels[post.category] || post.category}</span>
                               <span className="text-[8px] font-bold text-gray-400 uppercase">{post.date}</span>
                             </div>
-                            <h4 className="text-[18px] font-bold font-title leading-tight group-hover:text-primary transition-colors mb-1 tracking-tight text-secondary">
+                            <h4 className="text-[18px] font-semibold font-title leading-tight group-hover:text-primary transition-colors mb-1 tracking-tight text-gray-900">
                               {info.title}
                             </h4>
                             <p className="text-xs text-gray-500 line-clamp-2 leading-snug font-medium opacity-80">{info.excerpt}</p>
@@ -225,7 +225,7 @@ const App: React.FC = () => {
                               <span className="text-[8px] font-black text-primary uppercase tracking-widest">{labels[post.category] || post.category}</span>
                               <span className="text-[8px] font-bold text-gray-400 uppercase">{post.date}</span>
                             </div>
-                            <h2 className="text-[18px] font-bold font-title mb-1.5 group-hover:text-primary transition-colors leading-tight tracking-tight text-secondary">{info.title}</h2>
+                            <h2 className="text-[18px] font-semibold font-title mb-1.5 group-hover:text-primary transition-colors leading-tight tracking-tight text-gray-900">{info.title}</h2>
                             <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed font-medium">{info.excerpt}</p>
                           </div>
                         </article>
@@ -247,7 +247,7 @@ const App: React.FC = () => {
                   <span className="bg-gray-100 text-primary text-[8px] font-black px-2 py-0.5 uppercase rounded mb-3 inline-block tracking-widest">
                     {labels[selectedPost.category] || selectedPost.category}
                   </span>
-                  <h1 className="text-2xl md:text-3xl font-bold font-title mb-4 leading-tight text-secondary tracking-tight">{info.title}</h1>
+                  <h1 className="text-2xl md:text-3xl font-semibold font-title mb-4 leading-tight text-secondary tracking-tight">{info.title}</h1>
                   <div className="flex items-center space-x-4 mb-6 pb-3 border-b border-gray-50 text-[9px] font-black text-gray-400 uppercase tracking-widest">
                     <span className="text-secondary">{selectedPost.author}</span>
                     <span className="opacity-20">|</span>
