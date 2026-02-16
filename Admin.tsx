@@ -18,7 +18,8 @@ import {
   Clock,
   Upload,
   XCircle,
-  Loader2
+  Loader2,
+  Star
 } from 'lucide-react';
 
 interface AdminProps {
@@ -41,16 +42,18 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
     title: '',
     category: 'News',
     imageUrl: '', 
-    description: ''
+    description: '',
+    featured: false
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  // 1. Fetch News List Logic
   const fetchAdminNews = useCallback(async () => {
     try {
       const { data, error: fetchError } = await supabase
         .from('News')
-        .select('id, title, category, image_url, content, created_at')
+        .select('id, title, category, image_url, content, created_at, featured')
         .order('created_at', { ascending: false });
       
       if (fetchError) throw fetchError;
@@ -95,25 +98,20 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
   const applyTag = (startTag: string, endTag: string) => {
     const el = textAreaRef.current;
     if (!el) return;
-
     const start = el.selectionStart;
     const end = el.selectionEnd;
     const text = el.value;
     const selected = text.substring(start, end);
-    
     let processedTags = startTag;
     if (startTag.includes('href=""')) {
-      const url = prompt("Enter the URL (e.g., https://google.com):", "https://");
+      const url = prompt("Enter the URL:", "https://");
       if (url === null) return; 
       processedTags = startTag.replace('href=""', `href="${url}" target="_blank" class="text-primary underline font-bold"`);
     }
-
     const before = text.substring(0, start);
     const after = text.substring(end);
     const newText = before + processedTags + selected + endTag + after;
-
     setFormData({ ...formData, description: newText });
-    
     setTimeout(() => {
       el.focus();
       const newCursorPos = start + processedTags.length + selected.length + endTag.length;
@@ -121,13 +119,15 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
     }, 10);
   };
 
+  // 2. Edit Function Logic
   const handleEdit = (item: any) => {
     setEditingId(item.id);
     setFormData({
       title: item.title,
       category: item.category,
       imageUrl: item.image_url,
-      description: item.content
+      description: item.content,
+      featured: item.featured || false
     });
     setSelectedFile(null);
     setPreviewUrl(item.image_url);
@@ -135,9 +135,9 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // 3. Delete Function Logic
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this story?')) return;
-    
+    if (!confirm('Are you sure you want to delete this story? This cannot be undone.')) return;
     try {
       const { error: deleteError } = await supabase
         .from('News')
@@ -145,16 +145,16 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
         .eq('id', id);
 
       if (deleteError) throw deleteError;
-      alert('Story deleted.');
+      alert('✅ Story deleted successfully.');
       fetchAdminNews();
     } catch (err: any) {
-      alert('Error deleting: ' + (err.message || 'Check connection'));
+      alert('❌ Error deleting: ' + (err.message || 'Check connection'));
     }
   };
 
   const resetForm = () => {
     setEditingId(null);
-    setFormData({ title: '', category: 'News', imageUrl: '', description: '' });
+    setFormData({ title: '', category: 'News', imageUrl: '', description: '', featured: false });
     setSelectedFile(null);
     if (previewUrl && !previewUrl.startsWith('http')) {
       URL.revokeObjectURL(previewUrl);
@@ -167,31 +167,29 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
     const filePath = `${fileName}`;
-
     const { error: uploadError } = await supabase.storage
       .from('news-images')
       .upload(filePath, file);
-
     if (uploadError) throw uploadError;
-
     const { data } = supabase.storage
       .from('news-images')
       .getPublicUrl(filePath);
-
     return data.publicUrl;
   };
 
+  // 4. Update Logic inside Submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
     try {
       let finalImageUrl = formData.imageUrl;
 
+      // Ensure an image exists if it's a new post
       if (!editingId && !selectedFile) {
-        throw new Error("Please pick a photo from your gallery.");
+        throw new Error("Please select an image from your gallery.");
       }
 
+      // Upload if a new file was chosen
       if (selectedFile) {
         finalImageUrl = await handleUpload(selectedFile);
       }
@@ -201,30 +199,32 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
         category: formData.category,
         content: formData.description.trim(),
         image_url: finalImageUrl,
-        featured: false
+        featured: formData.featured
       };
 
       if (editingId) {
+        // Update existing row
         const { error: updateError } = await supabase
           .from('News')
           .update(payload)
           .eq('id', editingId);
         
         if (updateError) throw updateError;
-        alert('✅ Story Updated!');
+        alert('✅ Story Updated Successfully!');
       } else {
+        // Insert new row
         const { error: insertError } = await supabase
           .from('News')
           .insert([payload]);
         
         if (insertError) throw insertError;
-        alert('✅ Story Published!');
+        alert('✅ Story Published Successfully!');
       }
 
       resetForm();
       fetchAdminNews();
     } catch (err: any) {
-      alert('❌ Error: ' + (err.message || 'Upload failed'));
+      alert('❌ Error: ' + (err.message || 'Action failed'));
     } finally {
       setLoading(false);
     }
@@ -241,14 +241,14 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
               <Lock className="text-white" size={32} />
             </div>
             <h2 className="text-3xl font-black text-secondary tracking-tighter uppercase">BM <span className="text-primary">BUZZ</span> Admin</h2>
-            <p className="text-gray-400 text-sm mt-3 font-medium">Secure Content Portal</p>
+            <p className="text-gray-400 text-sm mt-3 font-medium">Secure Access Required</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-6">
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Admin Password"
+              placeholder="Enter Admin Password"
               className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-primary focus:outline-none transition-all text-center text-lg font-bold"
               required
             />
@@ -280,7 +280,11 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
               <span className="w-10 h-1 text-primary mr-4 block"></span>
               {editingId ? 'Edit' : 'Publish'} <span className="text-primary ml-2 underline">Story</span>
             </h2>
-            {editingId && <button onClick={resetForm} className="text-[10px] font-black uppercase bg-gray-100 px-4 py-2 rounded hover:bg-gray-200">Cancel Edit</button>}
+            {editingId && (
+              <button onClick={resetForm} className="text-[10px] font-black uppercase bg-white border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-50 shadow-sm transition-all">
+                Cancel Edit
+              </button>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="p-10 space-y-10">
@@ -291,7 +295,7 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
                 required
                 value={formData.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
-                placeholder="Enter story headline..."
+                placeholder="Enter compelling story headline..."
                 className="w-full px-0 py-4 text-2xl font-serif border-b-2 border-gray-100 focus:border-primary focus:outline-none transition-all"
               />
             </div>
@@ -324,9 +328,9 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
                     />
                   </div>
                   {previewUrl && (
-                    <div className="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-primary/20 shadow-md">
+                    <div className="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-primary/20 shadow-md flex-shrink-0">
                       <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
-                      <button type="button" onClick={() => { setSelectedFile(null); setPreviewUrl(editingId ? formData.imageUrl : null); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="absolute top-0.5 right-0.5 bg-white rounded-full p-0.5 shadow hover:text-primary"><XCircle size={12} /></button>
+                      <button type="button" onClick={() => { setSelectedFile(null); setPreviewUrl(editingId ? formData.imageUrl : null); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="absolute top-0.5 right-0.5 bg-white rounded-full p-0.5 shadow hover:text-primary transition-colors"><XCircle size={12} /></button>
                     </div>
                   )}
                 </div>
@@ -334,55 +338,102 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
             </div>
 
             <div className="space-y-3">
+              <div className="flex items-center space-x-3 bg-gray-50 p-4 rounded-xl border border-gray-100 max-w-sm">
+                <input
+                  type="checkbox"
+                  id="featured"
+                  checked={formData.featured}
+                  onChange={(e) => setFormData({...formData, featured: e.target.checked})}
+                  className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary transition-all cursor-pointer"
+                />
+                <label htmlFor="featured" className="text-[10px] font-black text-gray-700 uppercase tracking-widest cursor-pointer flex items-center">
+                  <Star size={12} className={`mr-2 ${formData.featured ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'}`} />
+                  Mark as Featured Story
+                </label>
+              </div>
+            </div>
+
+            <div className="space-y-3">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center"><FileText size={14} className="mr-2 text-primary" /> Full Story Body</label>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center"><FileText size={14} className="mr-2 text-primary" /> Story Content</label>
                 <div className="flex bg-gray-100 rounded-lg p-1 space-x-1 border border-gray-200">
                   <button type="button" onClick={() => applyTag('<b>', '</b>')} className="p-1.5 hover:bg-white rounded transition-colors" title="Bold"><Bold size={14} /></button>
                   <button type="button" onClick={() => applyTag('<i>', '</i>')} className="p-1.5 hover:bg-white rounded transition-colors" title="Italic"><Italic size={14} /></button>
-                  <button type="button" onClick={() => applyTag('<a href="">', '</a>')} className="p-1.5 hover:bg-primary hover:text-white rounded transition-colors px-2" title="Link"><LinkIcon size={14} /></button>
+                  <button type="button" onClick={() => applyTag('<a href="">', '</a>')} className="p-1.5 hover:bg-primary hover:text-white rounded transition-colors px-2" title="Insert Link"><LinkIcon size={14} /></button>
                 </div>
               </div>
               <textarea
                 ref={textAreaRef}
                 required
-                rows={8}
+                rows={10}
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Write the full news content here..."
-                className="w-full px-6 py-6 bg-gray-50 border border-gray-100 rounded-2xl focus:border-primary focus:outline-none transition-all text-gray-700 shadow-inner"
+                placeholder="Write the full community story here..."
+                className="w-full px-6 py-6 bg-gray-50 border border-gray-100 rounded-2xl focus:border-primary focus:outline-none transition-all text-gray-700 shadow-inner leading-relaxed"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full md:w-auto px-16 py-5 bg-black hover:bg-primary text-white font-black uppercase tracking-[0.3em] rounded-2xl shadow-xl transition-all flex items-center justify-center space-x-4 disabled:opacity-70"
+              className={`w-full md:w-auto px-16 py-5 ${editingId ? 'bg-blue-600' : 'bg-black'} hover:bg-primary text-white font-black uppercase tracking-[0.3em] rounded-2xl shadow-xl transition-all flex items-center justify-center space-x-4 disabled:opacity-70`}
             >
               {loading ? <Loader2 className="animate-spin" size={20} /> : (editingId ? <Edit3 size={20} /> : <PlusCircle size={20} />)}
-              <span>{loading ? 'Uploading & Saving...' : (editingId ? 'Update Story' : 'Publish to Feed')}</span>
+              <span>{loading ? 'Processing...' : (editingId ? 'Update News Story' : 'Publish Story to Feed')}</span>
             </button>
           </form>
         </div>
 
-        <div className="mt-16 space-y-6">
-          <h3 className="text-2xl font-black uppercase tracking-tighter border-b-2 border-primary pb-2">Recent Submissions ({newsList.length})</h3>
-          <div className="grid grid-cols-1 gap-4">
-            {newsList.map((item) => (
-              <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 group">
-                <img src={item.image_url} alt="" className="w-20 h-20 object-cover rounded-lg bg-gray-100" />
-                <div className="flex-grow">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[9px] font-black text-primary uppercase tracking-widest">{item.category}</span>
-                    <span className="text-[9px] text-gray-400">{new Date(item.created_at).toLocaleDateString()}</span>
+        {/* 5. List Section */}
+        <div className="mt-20 space-y-8">
+          <div className="flex items-center justify-between border-b-2 border-primary pb-3">
+            <h3 className="text-2xl font-black uppercase tracking-tighter flex items-center">
+              <Clock size={20} className="mr-3 text-primary" />
+              Recent Submissions <span className="ml-3 text-sm text-gray-400 font-bold bg-gray-100 px-3 py-1 rounded-full">{newsList.length}</span>
+            </h3>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-6">
+            {newsList.length > 0 ? (
+              newsList.map((item) => (
+                <div key={item.id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-start md:items-center gap-6 group hover:shadow-md transition-all">
+                  <div className="w-full md:w-32 h-24 rounded-xl overflow-hidden shadow-inner bg-gray-100 flex-shrink-0">
+                    <img src={item.image_url} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
-                  <h4 className="font-bold text-gray-900 line-clamp-1">{item.title}</h4>
+                  <div className="flex-grow min-w-0">
+                    <div className="flex flex-wrap items-center gap-3 mb-2">
+                      <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-primary/5 px-2 py-0.5 rounded">{item.category}</span>
+                      <span className="text-[10px] text-gray-400 font-bold">{new Date(item.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      {item.featured && <span className="text-[10px] font-black text-yellow-600 uppercase tracking-widest bg-yellow-50 px-2 py-0.5 rounded flex items-center"><Star size={10} className="mr-1 fill-yellow-600" /> Featured</span>}
+                    </div>
+                    <h4 className="text-lg font-bold text-gray-900 line-clamp-1 font-serif">{item.title}</h4>
+                    <p className="text-xs text-gray-400 mt-1 line-clamp-1 italic">{item.content.replace(/<[^>]*>/g, '').substring(0, 100)}...</p>
+                  </div>
+                  <div className="flex gap-3 w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-gray-50">
+                    <button 
+                      onClick={() => handleEdit(item)} 
+                      className="flex-1 md:flex-none p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center"
+                      title="Edit Story"
+                    >
+                      <Edit3 size={18} />
+                      <span className="ml-2 md:hidden font-bold uppercase text-[10px]">Edit</span>
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(item.id)} 
+                      className="flex-1 md:flex-none p-3 bg-red-50 text-primary rounded-xl hover:bg-primary hover:text-white transition-all flex items-center justify-center"
+                      title="Delete Story"
+                    >
+                      <Trash2 size={18} />
+                      <span className="ml-2 md:hidden font-bold uppercase text-[10px]">Delete</span>
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button onClick={() => handleEdit(item)} className="p-2 text-gray-400 hover:text-secondary"><Edit3 size={18} /></button>
-                  <button onClick={() => handleDelete(item.id)} className="p-2 text-gray-400 hover:text-primary"><Trash2 size={18} /></button>
-                </div>
+              ))
+            ) : (
+              <div className="py-20 text-center border-2 border-dashed border-gray-200 rounded-3xl">
+                <p className="text-gray-400 font-black uppercase tracking-widest text-sm">No stories found in database</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

@@ -45,7 +45,7 @@ const CategoryIcon: React.FC<{ category: string; className?: string }> = ({ cate
     case 'Talents': return <Star className={className} size={14} />;
     case 'Jobs': return <Briefcase className={className} size={14} />;
     case 'Silchar': return <Building2 className={className} size={14} />;
-    case 'Manipur': return <MapPin className={className} size={14} />;
+    case 'Manipuri': return <MapPin className={className} size={14} />;
     case 'Hingala': return <Landmark className={className} size={14} />;
     case 'Baronuni': return <Landmark className={className} size={14} />;
     case 'Bangladesh': return <Flag className={className} size={14} />;
@@ -163,8 +163,6 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
       {isMenuOpen && (
         <div className="lg:hidden bg-white border-t border-gray-100 py-4 absolute w-full left-0 shadow-xl max-h-[80vh] overflow-y-auto z-50">
           <ul className="flex flex-col px-6 space-y-4 pb-8">
-            {/* 'Home' link removed from mobile menu as requested */}
-            
             <li>
               <div className="text-primary font-black uppercase tracking-widest text-xs mb-4 border-b pb-1">{labels['News']}</div>
               <div className="grid grid-cols-2 gap-4">
