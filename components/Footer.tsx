@@ -1,13 +1,14 @@
 
 import React from 'react';
 import { CATEGORIES, Language, TRANSLATIONS } from '../constants';
-import { Mail, MapPin, Phone, Facebook, Twitter, Youtube, ExternalLink } from 'lucide-react';
+import { Mail, MapPin, Phone, Facebook, Twitter, Youtube, ExternalLink, ShieldCheck } from 'lucide-react';
 
 interface FooterProps {
   currentLang: Language;
+  onAdminClick?: () => void;
 }
 
-const Footer: React.FC<FooterProps> = ({ currentLang }) => {
+const Footer: React.FC<FooterProps> = ({ currentLang, onAdminClick }) => {
   const t = TRANSLATIONS[currentLang];
   return (
     <footer className="bg-secondary text-white pt-16 pb-8 font-sans">
@@ -40,7 +41,7 @@ const Footer: React.FC<FooterProps> = ({ currentLang }) => {
               <li><a href="#" className="hover:text-white transition-colors flex items-center group"><ExternalLink size={12} className="mr-2 opacity-0 group-hover:opacity-100 transition-opacity" /> About Us</a></li>
               <li><a href="#" className="hover:text-white transition-colors flex items-center group"><ExternalLink size={12} className="mr-2 opacity-0 group-hover:opacity-100 transition-opacity" /> Contact Us</a></li>
               <li><a href="#" className="hover:text-white transition-colors flex items-center group"><ExternalLink size={12} className="mr-2 opacity-0 group-hover:opacity-100 transition-opacity" /> Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors flex items-center group"><ExternalLink size={12} className="mr-2 opacity-0 group-hover:opacity-100 transition-opacity" /> Terms of Service</a></li>
+              <li><button onClick={onAdminClick} className="hover:text-white transition-colors flex items-center group"><ShieldCheck size={12} className="mr-2 opacity-0 group-hover:opacity-100 transition-opacity" /> Admin Dashboard</button></li>
             </ul>
           </div>
 

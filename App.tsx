@@ -4,11 +4,12 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import NewsTicker from './components/NewsTicker';
 import Sidebar from './components/Sidebar';
+import Admin from './Admin';
 import { MOCK_NEWS, CATEGORIES, CATEGORY_LABELS, TRANSLATIONS, Language } from './constants';
 import { NewsPost } from './types';
 
 const App: React.FC = () => {
-  const [activePage, setActivePage] = useState<'Home' | 'Category' | 'Post'>('Home');
+  const [activePage, setActivePage] = useState<'Home' | 'Category' | 'Post' | 'Admin'>('Home');
   const [selectedCategory, setSelectedCategory] = useState('Home');
   const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
   const [language, setLanguage] = useState<Language>('en');
@@ -55,13 +56,14 @@ const App: React.FC = () => {
         currentLang={language}
         onLanguageChange={handleLanguageChange}
       />
-      <NewsTicker currentLang={language} />
+      
+      {activePage !== 'Admin' && <NewsTicker currentLang={language} />}
 
       <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div className={`grid grid-cols-1 ${activePage === 'Admin' ? 'lg:grid-cols-1' : 'lg:grid-cols-12'} gap-10`}>
           
           {/* Main Content Area */}
-          <div className="lg:col-span-8">
+          <div className={activePage === 'Admin' ? 'lg:col-span-1' : 'lg:col-span-8'}>
             {activePage === 'Home' && (
               <div className="space-y-12">
                 {/* Hero Featured Section */}
@@ -169,16 +171,22 @@ const App: React.FC = () => {
                 </article>
               );
             })()}
+
+            {activePage === 'Admin' && (
+              <Admin currentLang={language} onBack={() => setActivePage('Home')} />
+            )}
           </div>
 
-          {/* Sidebar */}
-          <div className="lg:col-span-4">
-            <Sidebar onPostClick={handlePostClick} currentLang={language} />
-          </div>
+          {/* Sidebar - Hidden on Admin page for focus */}
+          {activePage !== 'Admin' && (
+            <div className="lg:col-span-4">
+              <Sidebar onPostClick={handlePostClick} currentLang={language} />
+            </div>
+          )}
         </div>
       </main>
 
-      <Footer currentLang={language} />
+      <Footer onAdminClick={() => setActivePage('Admin')} currentLang={language} />
       
       <style>{`
         .article-content h2 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 2.25rem; margin: 2.5rem 0 1.25rem; color: #111827; }
