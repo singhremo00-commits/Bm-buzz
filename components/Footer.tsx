@@ -94,11 +94,7 @@ const Footer: React.FC<FooterProps> = ({ currentLang }) => {
               © 2026 BMBuzz. All Rights Reserved.
             </span>
           </p>
-          <p className="flex items-center">
-            {t.designed} 
-            <span className="mx-2">|</span> 
-            {t.madeIn}
-          </p>
+          {/* Section removed as requested */}
         </div>
       </div>
     </footer>
