@@ -70,22 +70,22 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white shadow-md border-b border-gray-100 font-sans">
-      <div className="bg-secondary text-white py-1 md:py-2">
-        <div className="container mx-auto px-4 flex justify-between items-center text-[10px] md:text-xs font-semibold uppercase tracking-wider">
-          <div className="hidden md:flex items-center space-x-2">
-            <Globe size={12} className="text-primary" />
-            <span>{t.voice}</span>
+    <header className="sticky top-0 z-50 w-full bg-white shadow-xl border-b border-gray-100 font-sans">
+      <div className="bg-secondary text-white py-2">
+        <div className="container mx-auto px-4 flex justify-between items-center text-[10px] md:text-xs font-bold uppercase tracking-widest">
+          <div className="hidden md:flex items-center space-x-3">
+            <Globe size={14} className="text-primary" />
+            <span className="opacity-90">{t.voice}</span>
           </div>
-          <div className="flex items-center space-x-4 ml-auto md:ml-0">
-            <span className="hidden sm:inline">Friday, October 24, 2025</span>
-            <div className="flex items-center space-x-2 border-l border-white/20 pl-4">
+          <div className="flex items-center space-x-6 ml-auto md:ml-0">
+            <span className="hidden sm:inline opacity-70">Friday, October 24, 2025</span>
+            <div className="flex items-center space-x-3 border-l border-white/20 pl-6">
               {LANGUAGES.map((lang) => (
                 <button
                   key={lang.code}
                   onClick={() => onLanguageChange(lang.code as Language)}
-                  className={`px-2 py-1 rounded transition-colors hover:bg-white/10 ${
-                    currentLang === lang.code ? 'bg-white/20 font-bold' : 'opacity-70'
+                  className={`px-2 py-1 rounded-md transition-all ${
+                    currentLang === lang.code ? 'bg-primary text-white font-black' : 'opacity-60 hover:opacity-100'
                   }`}
                 >
                   {lang.name}
@@ -96,18 +96,18 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
         </div>
       </div>
 
-      <nav className="container mx-auto px-4 py-3 flex items-center justify-between">
+      <nav className="container mx-auto px-4 py-5 flex items-center justify-between">
         <div className="cursor-pointer" onClick={onLogoClick}>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tighter text-secondary">
+          <h1 className="text-3xl md:text-4xl font-black font-title tracking-tighter text-secondary">
             BM<span className="text-primary">BUZZ</span>
           </h1>
         </div>
 
-        <ul className="hidden lg:flex items-center space-x-6">
+        <ul className="hidden lg:flex items-center space-x-8">
           <li>
             <button
               onClick={() => onCategoryClick('Home')}
-              className="text-sm font-bold uppercase text-gray-700 hover:text-primary transition-colors tracking-tight"
+              className="text-xs font-black font-title uppercase text-secondary hover:text-primary transition-all tracking-wider"
             >
               {labels['Home']}
             </button>
@@ -118,26 +118,28 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
               onMouseLeave={() => setIsNewsDropdownOpen(false)}>
             <button
               onClick={() => onCategoryClick('News')}
-              className="flex items-center space-x-1 text-sm font-bold uppercase text-gray-700 hover:text-primary transition-colors tracking-tight py-2"
+              className="flex items-center space-x-2 text-xs font-black font-title uppercase text-secondary hover:text-primary transition-all tracking-wider py-2"
             >
               <CategoryIcon category="News" className="text-primary/70" />
               <span>{labels['News']}</span>
-              <ChevronDown size={14} className={`transition-transform duration-200 ${isNewsDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown size={14} className={`transition-transform duration-300 ${isNewsDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Area Dropdown */}
-            <div className={`absolute left-0 top-full bg-white shadow-xl border border-gray-100 rounded-b-lg py-2 min-w-[200px] transition-all duration-200 transform origin-top ${isNewsDropdownOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0 pointer-events-none'}`}>
-              <div className="px-4 py-1 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 mb-2">{t.areas}</div>
-              {REGIONAL_CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => handleAreaClick(cat)}
-                  className="flex items-center space-x-3 w-full px-4 py-2.5 text-left text-sm font-semibold text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors border-l-2 border-transparent hover:border-primary"
-                >
-                  <CategoryIcon category={cat} className="text-gray-400 group-hover:text-primary" />
-                  <span>{labels[cat] || cat}</span>
-                </button>
-              ))}
+            <div className={`absolute left-0 top-full bg-white shadow-2xl border border-gray-100 rounded-2xl py-3 min-w-[240px] transition-all duration-300 transform origin-top ${isNewsDropdownOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0 pointer-events-none'}`}>
+              <div className="px-5 py-2 text-[10px] font-black text-gray-300 uppercase tracking-widest border-b border-gray-50 mb-2">{t.areas}</div>
+              <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
+                {REGIONAL_CATEGORIES.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => handleAreaClick(cat)}
+                    className="flex items-center space-x-4 w-full px-5 py-3 text-left text-xs font-bold text-secondary hover:bg-primary/5 hover:text-primary transition-all border-l-4 border-transparent hover:border-primary uppercase tracking-wide"
+                  >
+                    <CategoryIcon category={cat} className="text-gray-300 group-hover:text-primary" />
+                    <span>{labels[cat] || cat}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </li>
 
@@ -145,7 +147,7 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
             <li key={cat}>
               <button
                 onClick={() => onCategoryClick(cat)}
-                className="flex items-center space-x-1 text-sm font-bold uppercase text-gray-700 hover:text-primary transition-colors tracking-tight"
+                className="flex items-center space-x-2 text-xs font-black font-title uppercase text-secondary hover:text-primary transition-all tracking-wider"
               >
                 <CategoryIcon category={cat} className="text-primary/70" />
                 <span>{labels[cat] || cat}</span>
@@ -154,25 +156,25 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
           ))}
         </ul>
 
-        <button className="lg:hidden p-2 text-gray-700" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+        <button className="lg:hidden p-3 text-secondary bg-gray-50 rounded-xl" onClick={() => setIsMenuOpen(!isMenuOpen)}>
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </nav>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-100 py-4 absolute w-full left-0 shadow-xl max-h-[80vh] overflow-y-auto z-50">
-          <ul className="flex flex-col px-6 space-y-4 pb-8">
+        <div className="lg:hidden bg-white border-t border-gray-100 py-6 absolute w-full left-0 shadow-2xl max-h-[85vh] overflow-y-auto z-50">
+          <ul className="flex flex-col px-8 space-y-8 pb-10">
             <li>
-              <div className="text-primary font-black uppercase tracking-widest text-xs mb-4 border-b pb-1">{labels['News']}</div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="text-primary font-black uppercase tracking-[0.2em] text-[10px] mb-6 border-b border-gray-50 pb-2">{labels['News']}</div>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-5">
                 {REGIONAL_CATEGORIES.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => handleAreaClick(cat)}
-                    className="flex items-center space-x-2 text-sm font-bold text-gray-600 hover:text-primary"
+                    className="flex items-center space-x-3 text-xs font-bold text-secondary hover:text-primary transition-all uppercase tracking-wide"
                   >
-                    <CategoryIcon category={cat} className="text-primary/50" />
+                    <CategoryIcon category={cat} className="text-primary/40" />
                     <span>{labels[cat]}</span>
                   </button>
                 ))}
@@ -180,13 +182,13 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
             </li>
 
             <li>
-              <div className="text-primary font-black uppercase tracking-widest text-xs mb-4 border-b pb-1">Categories</div>
-              <div className="flex flex-col space-y-3">
+              <div className="text-primary font-black uppercase tracking-[0.2em] text-[10px] mb-6 border-b border-gray-50 pb-2">Categories</div>
+              <div className="flex flex-col space-y-5">
                 {GENERAL_CATEGORIES.filter(c => c !== 'News').map((cat) => (
                   <button
                     key={cat}
                     onClick={() => { onCategoryClick(cat); setIsMenuOpen(false); }}
-                    className="flex items-center space-x-3 text-lg font-bold uppercase text-gray-800"
+                    className="flex items-center space-x-4 text-xl font-black font-title uppercase text-secondary hover:text-primary transition-all tracking-tight"
                   >
                     <CategoryIcon category={cat} className="text-primary" />
                     <span>{labels[cat] || cat}</span>

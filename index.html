@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BM BUZZ - Admin Panel</title>
-    <meta name="description" content="Admin Dashboard for BMBuzz news portal.">
+    <title>BM BUZZ - Bishnupriya Community News</title>
+    <meta name="description" content="Voice of the Bishnupriya Community. Premier news portal for music, culture, and regional updates.">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐝</text></svg>">
@@ -12,7 +12,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -22,10 +22,11 @@
                     colors: {
                         primary: '#dc2626',
                         secondary: '#111827',
+                        background: '#F9FAFB',
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        title: ['"Montserrat"', 'sans-serif'],
                     }
                 }
             }
@@ -33,15 +34,20 @@
     </script>
     <style>
         .news-ticker-animation {
-            animation: scroll 30s linear infinite;
+            animation: scroll 35s linear infinite;
         }
         @keyframes scroll {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
         }
         .sticky-header {
-            backdrop-filter: blur(8px);
-            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        body {
+            background-color: #F9FAFB;
+            color: #111827;
+            -webkit-font-smoothing: antialiased;
         }
     </style>
 <script type="importmap">
@@ -60,7 +66,7 @@
 }
 </script>
 </head>
-<body class="bg-gray-50 text-gray-900 overflow-x-hidden font-sans">
+<body class="bg-background text-secondary overflow-x-hidden font-sans">
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
 </body>
