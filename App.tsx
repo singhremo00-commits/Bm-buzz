@@ -178,7 +178,7 @@ const App: React.FC = () => {
                           <span>{featuredPost.date}</span>
                         </div>
                         
-                        <p className="hidden md:block mt-4 text-sm text-gray-200 line-clamp-2 opacity-80 font-medium leading-relaxed max-w-3xl">{info.excerpt}</p>
+                        <p className="hidden md:block mt-4 text-sm text-gray-200 line-clamp-2 opacity-80 font-medium leading-relaxed max-w-3xl whitespace-pre-wrap">{info.excerpt}</p>
                       </div>
                     </section>
                   );
@@ -214,7 +214,7 @@ const App: React.FC = () => {
                               <span>{post.date}</span>
                             </div>
                             
-                            <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed font-medium opacity-90">{info.excerpt}</p>
+                            <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed font-medium opacity-90 whitespace-pre-wrap">{info.excerpt}</p>
                           </article>
                         );
                       })}
@@ -250,7 +250,7 @@ const App: React.FC = () => {
                               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">{post.date}</span>
                             </div>
                             <h2 className="text-[22px] md:text-2xl font-semibold font-title mb-2 group-hover:text-primary transition-colors leading-tight tracking-tight text-slate-900">{info.title}</h2>
-                            <p className="text-base text-slate-600 line-clamp-3 leading-relaxed font-medium">{info.excerpt}</p>
+                            <p className="text-base text-slate-600 line-clamp-3 leading-relaxed font-medium whitespace-pre-wrap">{info.excerpt}</p>
                           </div>
                         </article>
                       );
@@ -273,9 +273,9 @@ const App: React.FC = () => {
                       {labels[selectedPost.category] || selectedPost.category}
                     </span>
                   </div>
-                  <h1 className="text-3xl md:text-5xl font-semibold font-title mb-6 leading-tight text-slate-900 tracking-tight">{info.title}</h1>
+                  <h1 className="text-3xl md:text-5xl font-semibold font-title mb-4 leading-tight text-slate-900 tracking-tight">{info.title}</h1>
                   
-                  {/* Reduced metadata spacing (mb-4 instead of mb-10) */}
+                  {/* Metadata with tighter padding and border */}
                   <div className="flex items-center space-x-6 mb-4 pb-4 border-b border-gray-100 text-[11px] font-black text-gray-500 uppercase tracking-widest">
                     <div className="flex items-center space-x-2">
                       <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black">B</div>
@@ -287,13 +287,17 @@ const App: React.FC = () => {
                     </span>
                   </div>
                   
-                  {/* Zero mt and smaller mb to tighten the gap further */}
-                  <div className="mb-8 mt-0">
+                  {/* Minimized gap between meta and image (mb-6 instead of mb-8) */}
+                  <div className="mb-6 mt-0">
                     <img src={selectedPost.image} alt={info.title} className="w-full shadow-2xl border border-gray-100" />
                   </div>
                   
-                  <div className="prose prose-lg max-w-none text-slate-800 leading-relaxed font-medium">
-                    <div className="article-content space-y-6" dangerouslySetInnerHTML={{ __html: info.content }} />
+                  <div className="prose prose-lg max-w-none text-slate-800 leading-[1.8] font-medium">
+                    {/* Added whitespace-pre-wrap to handle line breaks and custom paragraph spacing */}
+                    <div 
+                      className="article-content whitespace-pre-wrap break-words [&>p]:mb-6" 
+                      dangerouslySetInnerHTML={{ __html: info.content }} 
+                    />
                   </div>
                 </article>
               );
