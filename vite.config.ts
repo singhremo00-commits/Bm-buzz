@@ -1,16 +1,16 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './', // Ensures assets load correctly relative to the root (important for Vercel/GitHub Pages)
+  base: './', // Ensures all assets are loaded relative to the deployment path
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    sourcemap: false,
-    // Ensure the entry point is correctly identified if needed, 
-    // though Vite usually handles index.html automatically
+    emptyOutDir: true,
+    rollupOptions: {
+      input: 'index.html', // Explicitly setting the entry HTML
+    },
   },
   server: {
     port: 3000,
