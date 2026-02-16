@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Language, CATEGORIES } from './constants';
 import { supabase } from './supabaseClient';
 import { 
@@ -12,7 +12,11 @@ import {
   Globe, 
   Link as LinkIcon, 
   Bold, 
-  Italic 
+  Italic,
+  Trash2,
+  Edit3,
+  PlusCircle,
+  Clock
 } from 'lucide-react';
 
 interface AdminProps {
@@ -25,6 +29,8 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [newsList, setNewsList] = useState<any[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   // Form State
@@ -34,6 +40,26 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
     imageUrl: '',
     description: ''
   });
+
+  const fetchAdminNews = useCallback(async () => {
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('News')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (fetchError) throw fetchError;
+      setNewsList(data || []);
+    } catch (err: any) {
+      console.error('Fetch Admin List Error:', err.message);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchAdminNews();
+    }
+  }, [isAuthenticated, fetchAdminNews]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,32 +105,77 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
     }, 10);
   };
 
+  const handleEdit = (item: any) => {
+    setEditingId(item.id);
+    setFormData({
+      title: item.title,
+      category: item.category,
+      imageUrl: item.image_url,
+      description: item.content
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this story permanently?')) return;
+    
+    try {
+      const { error: deleteError } = await supabase
+        .from('News')
+        .delete()
+        .eq('id', id);
+
+      if (deleteError) throw deleteError;
+      
+      alert('🗑️ Story deleted successfully.');
+      fetchAdminNews();
+    } catch (err: any) {
+      alert('Error deleting: ' + err.message);
+    }
+  };
+
+  const resetForm = () => {
+    setEditingId(null);
+    setFormData({ title: '', category: 'News', imageUrl: '', description: '' });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      // Strictly targeting the 'News' table with plain string data
-      const { error: supabaseError } = await supabase
-        .from('News')
-        .insert([
-          {
-            title: String(formData.title || '').trim(),
-            category: String(formData.category || 'News'),
-            content: String(formData.description || '').trim(),
-            image_url: String(formData.imageUrl || '').trim(),
-            featured: false
-          }
-        ]);
+      const payload = {
+        title: String(formData.title || '').trim(),
+        category: String(formData.category || 'News'),
+        content: String(formData.description || '').trim(),
+        image_url: String(formData.imageUrl || '').trim(),
+        featured: false
+      };
 
-      if (supabaseError) throw supabaseError;
-      
-      alert('✅ Story Published Successfully to BMBuzz!');
-      setFormData({ title: '', category: 'News', imageUrl: '', description: '' });
+      if (editingId) {
+        // Update existing story
+        const { error: updateError } = await supabase
+          .from('News')
+          .update(payload)
+          .eq('id', editingId);
+        
+        if (updateError) throw updateError;
+        alert('✅ Story Updated Successfully!');
+      } else {
+        // Insert new story
+        const { error: insertError } = await supabase
+          .from('News')
+          .insert([payload]);
+        
+        if (insertError) throw insertError;
+        alert('✅ Story Published Successfully!');
+      }
+
+      resetForm();
+      fetchAdminNews();
     } catch (err: any) {
-      // Only logging the message to prevent circular structure errors during serialization of the error object
-      console.error('Supabase Publish Error:', err.message || 'Unknown error');
-      alert('❌ Error publishing story: ' + (err.message || 'Check database connection'));
+      console.error('Supabase Operation Error:', err.message || 'Unknown error');
+      alert('❌ Error: ' + (err.message || 'Check database connection'));
     } finally {
       setLoading(false);
     }
@@ -121,7 +192,7 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
             <h2 className="text-3xl font-black text-secondary tracking-tighter uppercase">
               BM <span className="text-primary">BUZZ</span> Admin
             </h2>
-            <p className="text-gray-400 text-sm mt-3 font-medium">Enter secure credentials to proceed.</p>
+            <p className="text-gray-400 text-sm mt-3 font-medium">Secure content management portal.</p>
           </div>
           
           <form onSubmit={handleLogin} className="space-y-6">
@@ -156,14 +227,14 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 -mt-8 -mx-4">
+    <div className="min-h-screen bg-gray-50 -mt-8 -mx-4 pb-20">
       <header className="bg-black text-white p-6 shadow-2xl flex items-center justify-between sticky top-0 z-50 border-b-4 border-primary">
         <div className="flex items-center space-x-4">
           <div className="bg-primary p-2 rounded-lg">
             <LayoutDashboard size={24} className="text-white" />
           </div>
           <h1 className="text-2xl font-black tracking-tighter uppercase">
-            BM <span className="text-primary">BUZZ</span> <span className="hidden sm:inline">Admin Dashboard</span>
+            BM <span className="text-primary">BUZZ</span> <span className="hidden sm:inline">Management</span>
           </h1>
         </div>
         <div className="flex items-center space-x-4">
@@ -172,7 +243,7 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
             className="hidden md:flex items-center space-x-2 bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-all border border-white/10"
           >
             <Globe size={14} />
-            <span>View Website</span>
+            <span>View Site</span>
           </button>
           <button 
             onClick={handleLogout}
@@ -184,13 +255,22 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto py-12 px-6">
+      <div className="max-w-5xl mx-auto py-12 px-6 grid grid-cols-1 lg:grid-cols-1 gap-12">
+        {/* Editor Section */}
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-          <div className="bg-primary/5 p-8 border-b border-gray-100">
+          <div className="bg-primary/5 p-8 border-b border-gray-100 flex justify-between items-center">
             <h2 className="text-3xl font-black text-secondary tracking-tight uppercase flex items-center">
               <span className="w-10 h-1 text-primary mr-4 block"></span>
-              Publish <span className="text-primary ml-2 underline">New Story</span>
+              {editingId ? 'Edit' : 'Publish'} <span className="text-primary ml-2 underline">Story</span>
             </h2>
+            {editingId && (
+              <button 
+                onClick={resetForm}
+                className="text-[10px] font-black uppercase bg-gray-100 px-4 py-2 rounded hover:bg-gray-200"
+              >
+                Cancel Edit & Create New
+              </button>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="p-10 space-y-10">
@@ -270,11 +350,57 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
                 disabled={loading}
                 className="w-full md:w-auto px-16 py-5 bg-black hover:bg-primary text-white font-black uppercase tracking-[0.3em] rounded-2xl shadow-2xl transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center space-x-4 text-sm group"
               >
-                {loading ? <span className="animate-spin">🌀</span> : <Send size={20} />}
-                <span>{loading ? 'Publishing...' : 'Publish to BMBuzz'}</span>
+                {loading ? <span className="animate-spin">🌀</span> : (editingId ? <Edit3 size={20} /> : <PlusCircle size={20} />)}
+                <span>{loading ? 'Processing...' : (editingId ? 'Update Story' : 'Publish Story')}</span>
               </button>
             </div>
           </form>
+        </div>
+
+        {/* List Section */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b-2 border-primary pb-2">
+            <h3 className="text-2xl font-black uppercase tracking-tighter">Existing Stories</h3>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{newsList.length} Total</span>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-4">
+            {newsList.map((item) => (
+              <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 group hover:shadow-md transition-shadow">
+                <div className="w-20 h-20 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
+                  <img src={item.image_url} alt="" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-grow">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[9px] font-black text-primary uppercase tracking-widest">{item.category}</span>
+                    <span className="text-[9px] text-gray-400 flex items-center"><Clock size={10} className="mr-1" /> {new Date(item.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <h4 className="font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-1">{item.title}</h4>
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => handleEdit(item)}
+                    className="p-3 bg-gray-50 hover:bg-secondary hover:text-white text-gray-400 rounded-lg transition-all"
+                    title="Edit Story"
+                  >
+                    <Edit3 size={18} />
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(item.id)}
+                    className="p-3 bg-red-50 hover:bg-primary hover:text-white text-primary rounded-lg transition-all"
+                    title="Delete Story"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </div>
+            ))}
+            {newsList.length === 0 && (
+              <div className="py-20 text-center text-gray-400 font-bold uppercase tracking-[0.2em] border-2 border-dashed rounded-3xl">
+                No stories published yet
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
