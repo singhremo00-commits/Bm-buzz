@@ -84,26 +84,27 @@ const Admin: React.FC<AdminProps> = ({ onBack }) => {
     setLoading(true);
     
     try {
-      // Use 'News' table as specified by user
-      const { data, error } = await supabase
+      // Strictly targeting the 'News' table with plain string data
+      const { error: supabaseError } = await supabase
         .from('News')
         .insert([
           {
-            title: String(formData.title).trim(),
-            category: String(formData.category),
-            content: String(formData.description).trim(),
-            image_url: String(formData.imageUrl).trim(),
+            title: String(formData.title || '').trim(),
+            category: String(formData.category || 'News'),
+            content: String(formData.description || '').trim(),
+            image_url: String(formData.imageUrl || '').trim(),
             featured: false
           }
         ]);
 
-      if (error) throw error;
+      if (supabaseError) throw supabaseError;
       
       alert('✅ Story Published Successfully to BMBuzz!');
       setFormData({ title: '', category: 'News', imageUrl: '', description: '' });
     } catch (err: any) {
-      console.error('Supabase Publish Error:', err);
-      alert('❌ Error publishing story: ' + (err.message || 'Unknown database error'));
+      // Only logging the message to prevent circular structure errors during serialization of the error object
+      console.error('Supabase Publish Error:', err.message || 'Unknown error');
+      alert('❌ Error publishing story: ' + (err.message || 'Check database connection'));
     } finally {
       setLoading(false);
     }
