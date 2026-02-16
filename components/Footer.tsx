@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { CATEGORIES, Language, TRANSLATIONS } from '../constants';
 import { Mail, MapPin, Phone, Facebook, Twitter, Youtube, ExternalLink } from 'lucide-react';
@@ -8,6 +9,14 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ currentLang }) => {
   const t = TRANSLATIONS[currentLang];
+
+  // Hidden navigate to admin function
+  const handleAdminAccess = () => {
+    window.history.pushState({}, '', '/admin');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    window.scrollTo(0, 0);
+  };
+
   return (
     <footer className="bg-secondary text-white pt-16 pb-8 font-sans">
       <div className="container mx-auto px-4">
@@ -73,7 +82,15 @@ const Footer: React.FC<FooterProps> = ({ currentLang }) => {
         </div>
 
         <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 space-y-4 md:space-y-0">
-          <p>© 2026 BMBuzz. All Rights Reserved.</p>
+          <p 
+            onClick={handleAdminAccess} 
+            className="cursor-default select-none group relative"
+          >
+            <span className="opacity-100 group-hover:opacity-80 transition-opacity">
+              © 2026 BMBuzz. All Rights Reserved.
+            </span>
+            {/* The hidden trigger: Clicking exactly on the copyright symbol or text triggers the hidden navigation */}
+          </p>
           <p className="flex items-center">
             {t.designed} 
             <span className="mx-2">|</span> 
