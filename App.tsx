@@ -136,7 +136,7 @@ const App: React.FC = () => {
 
       <main className="flex-grow container mx-auto px-4 py-4 md:py-6">
         {isLoading && activePage !== 'Admin' && activePage !== 'About' && (
-          <div className="flex flex-col items-center justify-center py-12">
+          <div className="flex flex-col items-center justify-center py-10">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mb-2"></div>
             <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-[8px]">Syncing BMBuzz...</p>
           </div>
@@ -146,7 +146,7 @@ const App: React.FC = () => {
           
           <div className={activePage === 'Admin' || activePage === 'About' ? 'w-full' : 'lg:col-span-8'}>
             {activePage === 'Home' && !isLoading && (
-              <div className="space-y-8">
+              <div className="space-y-6">
                 {featuredPost ? (() => {
                   const info = getPostInfo(featuredPost);
                   return (
@@ -155,19 +155,17 @@ const App: React.FC = () => {
                         <img src={featuredPost.image} alt={info.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
                       </div>
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-                      <div className="absolute bottom-0 left-0 p-5 md:p-8 text-white max-w-4xl">
-                        <span className="bg-primary text-white text-[8px] font-black px-2 py-0.5 uppercase rounded-sm mb-2 inline-block tracking-[0.15em]">
+                      <div className="absolute bottom-0 left-0 p-5 md:p-6 text-white max-w-4xl">
+                        <span className="bg-primary text-white text-[8px] font-black px-2 py-0.5 uppercase rounded-sm mb-1 inline-block tracking-[0.15em]">
                           {labels[featuredPost.category] || featuredPost.category}
                         </span>
-                        <h2 className="text-xl md:text-3xl font-extrabold font-title tracking-tight leading-tight mb-1.5 group-hover:underline decoration-primary">
+                        <h2 className="text-xl md:text-2xl font-bold font-title tracking-tight leading-tight mb-1 group-hover:underline decoration-primary">
                           {info.title}
                         </h2>
                         <div className="flex items-center space-x-3 mb-2 text-[9px] font-bold uppercase tracking-wider text-gray-300 opacity-80">
-                          <span>{featuredPost.author}</span>
-                          <span className="opacity-30">|</span>
                           <span>{featuredPost.date}</span>
                         </div>
-                        <p className="text-xs text-gray-200 line-clamp-1 opacity-80 font-medium leading-normal">{info.excerpt}</p>
+                        <p className="hidden md:block text-xs text-gray-200 line-clamp-1 opacity-80 font-medium leading-normal">{info.excerpt}</p>
                       </div>
                     </section>
                   );
@@ -175,25 +173,25 @@ const App: React.FC = () => {
 
                 {otherNews.length > 0 && (
                   <section>
-                    <div className="flex items-center justify-between mb-5 border-b border-gray-100 pb-2">
-                      <h3 className="text-sm font-black font-title uppercase tracking-widest text-secondary">{t.latest}</h3>
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-1.5">
+                      <h3 className="text-[10px] font-black font-title uppercase tracking-[0.2em] text-gray-400">{t.latest}</h3>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                       {otherNews.map(post => {
                         const info = getPostInfo(post);
                         return (
                           <article key={post.id} className="flex flex-col cursor-pointer group" onClick={() => handlePostClick(post.id)}>
-                            <div className="aspect-[16/10] overflow-hidden rounded-lg mb-2.5 bg-gray-100">
+                            <div className="aspect-[16/10] overflow-hidden rounded-lg mb-2 bg-gray-100">
                               <img src={post.image} alt={info.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                             </div>
                             <div className="flex justify-between items-center mb-0.5">
                               <span className="text-[8px] font-black text-primary uppercase tracking-widest">{labels[post.category] || post.category}</span>
                               <span className="text-[8px] font-bold text-gray-400 uppercase">{post.date}</span>
                             </div>
-                            <h4 className="text-[22px] font-bold font-title leading-tight group-hover:text-primary transition-colors mb-1 tracking-tight text-secondary">
+                            <h4 className="text-[18px] font-bold font-title leading-tight group-hover:text-primary transition-colors mb-1 tracking-tight text-secondary">
                               {info.title}
                             </h4>
-                            <p className="text-xs text-gray-500 line-clamp-2 leading-snug font-medium opacity-90">{info.excerpt}</p>
+                            <p className="text-xs text-gray-500 line-clamp-2 leading-snug font-medium opacity-80">{info.excerpt}</p>
                           </article>
                         );
                       })}
@@ -210,10 +208,10 @@ const App: React.FC = () => {
                   <span className="mx-2 opacity-30">/</span>
                   <span className="text-primary">{labels[selectedCategory] || selectedCategory}</span>
                 </nav>
-                <h1 className="text-2xl font-black font-title uppercase mb-6 pb-2 border-b-2 border-primary inline-block tracking-tighter text-secondary">
+                <h1 className="text-xl font-black font-title uppercase mb-6 pb-1.5 border-b-2 border-primary inline-block tracking-tighter text-secondary">
                   {labels[selectedCategory] || selectedCategory}
                 </h1>
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 gap-5">
                   {allNews.filter(p => p.category === selectedCategory).length > 0 ? (
                     allNews.filter(p => p.category === selectedCategory).map(post => {
                       const info = getPostInfo(post);
@@ -227,7 +225,7 @@ const App: React.FC = () => {
                               <span className="text-[8px] font-black text-primary uppercase tracking-widest">{labels[post.category] || post.category}</span>
                               <span className="text-[8px] font-bold text-gray-400 uppercase">{post.date}</span>
                             </div>
-                            <h2 className="text-[22px] font-bold font-title mb-1.5 group-hover:text-primary transition-colors leading-tight tracking-tight text-secondary">{info.title}</h2>
+                            <h2 className="text-[18px] font-bold font-title mb-1.5 group-hover:text-primary transition-colors leading-tight tracking-tight text-secondary">{info.title}</h2>
                             <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed font-medium">{info.excerpt}</p>
                           </div>
                         </article>
@@ -246,11 +244,11 @@ const App: React.FC = () => {
               const info = getPostInfo(selectedPost);
               return (
                 <article className="max-w-3xl mx-auto">
-                  <span className="bg-gray-100 text-primary text-[8px] font-black px-2 py-0.5 uppercase rounded mb-4 inline-block tracking-widest">
+                  <span className="bg-gray-100 text-primary text-[8px] font-black px-2 py-0.5 uppercase rounded mb-3 inline-block tracking-widest">
                     {labels[selectedPost.category] || selectedPost.category}
                   </span>
-                  <h1 className="text-2xl md:text-4xl font-extrabold font-title mb-4 leading-tight text-secondary tracking-tight">{info.title}</h1>
-                  <div className="flex items-center space-x-4 mb-6 pb-4 border-b border-gray-50 text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                  <h1 className="text-2xl md:text-3xl font-bold font-title mb-4 leading-tight text-secondary tracking-tight">{info.title}</h1>
+                  <div className="flex items-center space-x-4 mb-6 pb-3 border-b border-gray-50 text-[9px] font-black text-gray-400 uppercase tracking-widest">
                     <span className="text-secondary">{selectedPost.author}</span>
                     <span className="opacity-20">|</span>
                     <span>{selectedPost.date}</span>
