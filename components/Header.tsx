@@ -197,9 +197,9 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
                   <button
                     key={cat}
                     onClick={() => { onCategoryClick(cat); setIsMenuOpen(false); }}
-                    className="flex items-center space-x-3 p-3 text-base font-bold font-title uppercase text-secondary hover:bg-primary/5 hover:text-primary rounded-xl transition-all active:scale-[0.98]"
+                    className="flex items-center space-x-3 p-3 text-base font-semibold uppercase text-gray-700 hover:bg-primary/5 hover:text-primary rounded-xl transition-all active:scale-[0.98]"
                   >
-                    <CategoryIcon category={cat} className="text-primary/50" />
+                    <CategoryIcon category={cat} className="text-primary/40" />
                     <span>{labels[cat] || cat}</span>
                   </button>
                 ))}
@@ -216,7 +216,7 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
                   <button
                     key={cat}
                     onClick={() => handleAreaClick(cat)}
-                    className="flex items-center space-x-2 text-xs font-semibold text-secondary hover:text-primary transition-all uppercase tracking-tight bg-gray-50/50 p-2.5 rounded-lg hover:bg-primary/5 active:scale-95 border border-transparent hover:border-primary/10"
+                    className="flex items-center space-x-2 text-xs font-medium text-gray-600 hover:text-primary transition-all uppercase tracking-tight bg-gray-50/50 p-2.5 rounded-lg hover:bg-primary/5 active:scale-95 border border-transparent hover:border-primary/10"
                   >
                     <CategoryIcon category={cat} className="text-primary/30" />
                     <span className="truncate">{labels[cat] || cat}</span>
@@ -236,7 +236,7 @@ const Header: React.FC<HeaderProps> = ({ onCategoryClick, onLogoClick, currentLa
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
                         currentLang === lang.code 
                           ? 'bg-primary border-primary text-white shadow-sm' 
-                          : 'bg-white border-gray-200 text-secondary hover:border-primary'
+                          : 'bg-white border-gray-200 text-gray-600 hover:border-primary'
                       }`}
                     >
                       {lang.name}
