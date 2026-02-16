@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -12,6 +13,9 @@ const App: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('Home');
   const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
   const [language, setLanguage] = useState<Language>('en');
+  
+  // Use state to manage news so 'publishing' works in current session
+  const [allNews, setAllNews] = useState<NewsPost[]>(MOCK_NEWS);
 
   // Sync state with URL path for manual /admin access
   useEffect(() => {
@@ -24,10 +28,7 @@ const App: React.FC = () => {
       }
     };
 
-    // Check on initial load
     handleLocationChange();
-
-    // Listen for popstate (back/forward browser buttons)
     window.addEventListener('popstate', handleLocationChange);
     return () => window.removeEventListener('popstate', handleLocationChange);
   }, []);
@@ -51,11 +52,40 @@ const App: React.FC = () => {
   };
 
   const handlePostClick = (id: string) => {
-    const post = MOCK_NEWS.find(p => p.id === id);
+    const post = allNews.find(p => p.id === id);
     if (post) {
       setSelectedPost(post);
       navigateTo('Post', `/post/${id}`);
     }
+  };
+
+  const handlePublish = (newPostData: any) => {
+    const newPost: NewsPost = {
+      id: Date.now().toString(),
+      category: newPostData.category,
+      author: 'Admin',
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      image: newPostData.imageUrl,
+      translations: {
+        en: {
+          title: newPostData.title,
+          excerpt: newPostData.description.substring(0, 150) + '...',
+          content: newPostData.description
+        },
+        bn: {
+          title: newPostData.title,
+          excerpt: newPostData.description.substring(0, 150) + '...',
+          content: newPostData.description
+        },
+        hi: {
+          title: newPostData.title,
+          excerpt: newPostData.description.substring(0, 150) + '...',
+          content: newPostData.description
+        }
+      }
+    };
+    
+    setAllNews([newPost, ...allNews]);
   };
 
   const handleLanguageChange = (lang: Language) => {
@@ -66,9 +96,9 @@ const App: React.FC = () => {
     return post.translations[language] || post.translations.en;
   };
 
-  const featuredPost = MOCK_NEWS.find(p => p.featured) || MOCK_NEWS[0];
-  const sortedNews = [...MOCK_NEWS].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  const otherNews = sortedNews.filter(p => p.id !== featuredPost.id);
+  const featuredPost = allNews.find(p => p.featured) || allNews[0];
+  const sortedNews = [...allNews].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const otherNews = sortedNews.filter(p => p.id !== featuredPost?.id);
 
   return (
     <div className={`min-h-screen flex flex-col font-sans selection:bg-primary selection:text-white ${language === 'bn' || language === 'hi' ? 'leading-relaxed' : ''}`}>
@@ -84,11 +114,9 @@ const App: React.FC = () => {
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className={`grid grid-cols-1 ${activePage === 'Admin' ? 'lg:grid-cols-1' : 'lg:grid-cols-12'} gap-10`}>
           
-          {/* Main Content Area */}
           <div className={activePage === 'Admin' ? 'lg:col-span-1' : 'lg:col-span-8'}>
             {activePage === 'Home' && (
               <div className="space-y-12">
-                {/* Hero Featured Section */}
                 {featuredPost && (() => {
                   const info = getPostInfo(featuredPost);
                   return (
@@ -108,7 +136,6 @@ const App: React.FC = () => {
                   );
                 })()}
 
-                {/* Trending & Latest List */}
                 <section>
                   <div className="flex items-center justify-between mb-8 border-b-2 border-primary pb-2">
                     <h3 className="text-2xl font-black uppercase tracking-tighter">{t.latest}</h3>
@@ -146,8 +173,8 @@ const App: React.FC = () => {
                   {labels[selectedCategory] || selectedCategory}
                 </h1>
                 <div className="grid grid-cols-1 gap-12">
-                  {MOCK_NEWS.filter(p => p.category === selectedCategory).length > 0 ? (
-                    MOCK_NEWS.filter(p => p.category === selectedCategory).map(post => {
+                  {allNews.filter(p => p.category === selectedCategory).length > 0 ? (
+                    allNews.filter(p => p.category === selectedCategory).map(post => {
                       const info = getPostInfo(post);
                       return (
                         <article key={post.id} className="flex flex-col md:flex-row gap-8 cursor-pointer group items-center" onClick={() => handlePostClick(post.id)}>
@@ -164,7 +191,7 @@ const App: React.FC = () => {
                     })
                   ) : (
                     <div className="py-20 text-center text-gray-400 uppercase font-black tracking-widest">
-                      Coming Soon to BMBuzz
+                      No posts in {selectedCategory} yet.
                     </div>
                   )}
                 </div>
@@ -195,11 +222,14 @@ const App: React.FC = () => {
             })()}
 
             {activePage === 'Admin' && (
-              <Admin currentLang={language} onBack={() => navigateTo('Home', '/')} />
+              <Admin 
+                currentLang={language} 
+                onBack={() => navigateTo('Home', '/')} 
+                onPublish={handlePublish}
+              />
             )}
           </div>
 
-          {/* Sidebar - Hidden on Admin page for focus */}
           {activePage !== 'Admin' && (
             <div className="lg:col-span-4">
               <Sidebar onPostClick={handlePostClick} currentLang={language} />
@@ -213,7 +243,6 @@ const App: React.FC = () => {
       <style>{`
         .article-content h2 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 2.25rem; margin: 2.5rem 0 1.25rem; color: #111827; }
         .article-content p { margin-bottom: 1.75rem; font-size: 1.125rem; line-height: 1.85; color: #374151; }
-        .article-content .lead { font-size: 1.5rem; font-weight: 600; margin-bottom: 2.5rem; color: #111827; }
         @media (max-width: 768px) {
           .article-content h2 { font-size: 1.75rem; }
         }

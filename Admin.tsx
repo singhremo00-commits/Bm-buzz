@@ -1,13 +1,15 @@
+
 import React, { useState } from 'react';
-import { Language, TRANSLATIONS, CATEGORIES } from './constants';
-import { Lock, FileText, Image as ImageIcon, Tag, Send, ArrowLeft, LogOut, LayoutDashboard } from 'lucide-react';
+import { Language, TRANSLATIONS, CATEGORIES, CATEGORY_LABELS } from './constants';
+import { Lock, FileText, Image as ImageIcon, Tag, Send, ArrowLeft, LogOut, LayoutDashboard, Globe } from 'lucide-react';
 
 interface AdminProps {
   currentLang: Language;
   onBack: () => void;
+  onPublish: (data: any) => void;
 }
 
-const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
+const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -37,8 +39,8 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('BM BUZZ - New Post Published:', formData);
-    alert('✅ Success! Your news post has been logged to the system.');
+    onPublish(formData);
+    alert('✅ Published Successfully! Your post is now live in the ' + formData.category + ' section.');
     // Reset form
     setFormData({
       title: '',
@@ -47,6 +49,8 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
       description: ''
     });
   };
+
+  const labels = CATEGORY_LABELS['en']; // Use English keys for internal logic
 
   if (!isAuthenticated) {
     return (
@@ -105,13 +109,22 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
             BM <span className="text-primary">BUZZ</span> <span className="hidden sm:inline">Admin Dashboard</span>
           </h1>
         </div>
-        <button 
-          onClick={handleLogout}
-          className="bg-white/10 hover:bg-primary text-white px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all flex items-center space-x-2 border border-white/20"
-        >
-          <LogOut size={14} />
-          <span>Logout</span>
-        </button>
+        <div className="flex items-center space-x-4">
+          <button 
+            onClick={onBack}
+            className="hidden md:flex items-center space-x-2 bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-all border border-white/10"
+          >
+            <Globe size={14} />
+            <span>View Website</span>
+          </button>
+          <button 
+            onClick={handleLogout}
+            className="bg-white/10 hover:bg-primary text-white px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all flex items-center space-x-2 border border-white/20"
+          >
+            <LogOut size={14} />
+            <span>Logout</span>
+          </button>
+        </div>
       </header>
 
       <div className="max-w-4xl mx-auto py-12 px-6">
@@ -119,7 +132,7 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
           <div className="bg-primary/5 p-8 border-b border-gray-100">
             <h2 className="text-3xl font-black text-secondary tracking-tight uppercase flex items-center">
               <span className="w-10 h-1 text-primary mr-4 block"></span>
-              Create New <span className="text-primary ml-2 underline">Post</span>
+              Publish <span className="text-primary ml-2 underline">New Content</span>
             </h2>
           </div>
 
@@ -134,7 +147,7 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
                 required
                 value={formData.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
-                placeholder="Enter headline..."
+                placeholder="Enter an eye-catching headline..."
                 className="w-full px-0 py-4 text-2xl font-serif border-b-2 border-gray-100 focus:border-primary focus:outline-none transition-all placeholder:text-gray-200"
               />
             </div>
@@ -143,30 +156,37 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
               {/* Category */}
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center">
-                  <Tag size={14} className="mr-2 text-primary" /> Select Section
+                  <Tag size={14} className="mr-2 text-primary" /> Target Section (Synced with Menu)
                 </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-black text-gray-700 appearance-none cursor-pointer"
-                >
-                  {CATEGORIES.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({...formData, category: e.target.value})}
+                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-black text-gray-700 appearance-none cursor-pointer"
+                  >
+                    {CATEGORIES.map(cat => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    ▼
+                  </div>
+                </div>
               </div>
 
               {/* Image URL */}
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center">
-                  <ImageIcon size={14} className="mr-2 text-primary" /> Cover Image URL
+                  <ImageIcon size={14} className="mr-2 text-primary" /> Feature Image (Direct URL)
                 </label>
                 <input
                   type="url"
                   required
                   value={formData.imageUrl}
                   onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
-                  placeholder="Paste URL here..."
+                  placeholder="https://images.unsplash.com/..."
                   className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-600"
                 />
               </div>
@@ -175,14 +195,14 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
             {/* Content */}
             <div className="space-y-3">
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center">
-                <FileText size={14} className="mr-2 text-primary" /> Full Story Content
+                <FileText size={14} className="mr-2 text-primary" /> Detailed Story / Article Body
               </label>
               <textarea
                 required
                 rows={10}
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Tell the full story here..."
+                placeholder="Type the full story here. You can use HTML tags like <h2> or <p> for formatting..."
                 className="w-full px-6 py-6 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-sans leading-relaxed text-gray-700 shadow-inner"
               />
             </div>
@@ -200,7 +220,7 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
         </div>
         
         <p className="text-center text-gray-400 text-[10px] font-bold uppercase tracking-[0.5em] mt-12 opacity-50">
-          Powered by BMBuzz Infrastructure &copy; 2026
+          Administrator Console &copy; 2026 BM BUZZ
         </p>
       </div>
     </div>
