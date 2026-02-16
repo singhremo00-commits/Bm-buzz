@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Language, TRANSLATIONS } from './constants';
+import { Language, TRANSLATIONS, CATEGORIES } from './constants';
 import { Lock, FileText, Image as ImageIcon, Tag, Send, ArrowLeft, LogOut, LayoutDashboard } from 'lucide-react';
 
 interface AdminProps {
@@ -15,7 +15,7 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
   // Form State
   const [formData, setFormData] = useState({
     title: '',
-    category: 'Tokta Yaari',
+    category: 'News',
     imageUrl: '',
     description: ''
   });
@@ -42,7 +42,7 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
     // Reset form
     setFormData({
       title: '',
-      category: 'Tokta Yaari',
+      category: 'News',
       imageUrl: '',
       description: ''
     });
@@ -150,11 +150,9 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack }) => {
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
                   className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-black text-gray-700 appearance-none cursor-pointer"
                 >
-                  <option value="Home">Home</option>
-                  <option value="Tokta Yaari">Tokta Yaari (News)</option>
-                  <option value="Sanskriti">Sanskriti (Culture)</option>
-                  <option value="Sahitya">Sahitya (Literature)</option>
-                  <option value="Events">Events</option>
+                  {CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
                 </select>
               </div>
 

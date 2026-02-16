@@ -10,30 +10,48 @@ export const LANGUAGES = [
 export const CATEGORY_LABELS: Record<Language, Record<string, string>> = {
   en: {
     'Home': 'Home', 
-    'Tokta Yaari': 'Tokta Yaari', 
-    'Sanskriti': 'Sanskriti', 
-    'Sahitya': 'Sahitya', 
-    'Events': 'Events'
+    'News': 'News', 
+    'Music': 'Music', 
+    'Movies': 'Movies', 
+    'Culture': 'Culture', 
+    'Events': 'Events',
+    'Interviews': 'Interviews',
+    'Videos': 'Videos',
+    'Gallery': 'Gallery',
+    'Talent Showcase': 'Talents',
+    'Jobs': 'Jobs'
   },
   bn: {
     'Home': 'প্রচ্ছদ', 
-    'Tokta Yaari': 'তক্তা ইয়ারি', 
-    'Sanskriti': 'সংস্কৃতি', 
-    'Sahitya': 'সাহিত্য', 
-    'Events': 'ইভেন্ট'
+    'News': 'খবর', 
+    'Music': 'গান', 
+    'Movies': 'চলচ্চিত্র', 
+    'Culture': 'সংস্কৃতি', 
+    'Events': 'ইভেন্ট',
+    'Interviews': 'সাক্ষাৎকার',
+    'Videos': 'ভিডিও',
+    'Gallery': 'গ্যালারি',
+    'Talent Showcase': 'প্রতিভা',
+    'Jobs': 'চাকরি'
   },
   hi: {
     'Home': 'होम', 
-    'Tokta Yaari': 'समाचार', 
-    'Sanskriti': 'संस्कृति', 
-    'Sahitya': 'साहित्य', 
-    'Events': 'आयोजन'
+    'News': 'समाचार', 
+    'Music': 'संगीत', 
+    'Movies': 'फिल्में', 
+    'Culture': 'संस्कृति', 
+    'Events': 'आयोजन',
+    'Interviews': 'साक्षात्कार',
+    'Videos': 'वीडियो',
+    'Gallery': 'गैलरी',
+    'Talent Showcase': 'प्रतिभा',
+    'Jobs': 'नौकरियां'
   }
 };
 
 export const CATEGORIES: Category[] = [
-  'Home', 'Tokta Yaari', 'Sanskriti', 'Sahitya', 'Events'
-] as any;
+  'Home', 'News', 'Music', 'Movies', 'Culture', 'Events', 'Interviews', 'Videos', 'Gallery', 'Talent Showcase', 'Jobs'
+];
 
 export const BREAKING_NEWS: Record<Language, string[]> = {
   en: [
@@ -116,7 +134,7 @@ export const TRANSLATIONS: Record<Language, any> = {
 export const MOCK_NEWS: NewsPost[] = [
   {
     id: '7',
-    category: 'Tokta Yaari',
+    category: 'News',
     author: 'Deepankar Jain',
     date: 'Oct 24, 2025',
     image: 'https://images.unsplash.com/photo-1514525253361-bee8718a7439?auto=format&fit=crop&q=80&w=1200',
@@ -166,7 +184,7 @@ export const MOCK_NEWS: NewsPost[] = [
   },
   {
     id: '2',
-    category: 'Sanskriti',
+    category: 'Culture',
     author: 'Rina Sinha',
     date: 'Oct 22, 2025',
     image: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&q=80&w=800',
@@ -190,7 +208,7 @@ export const MOCK_NEWS: NewsPost[] = [
   },
   {
     id: '3',
-    category: 'Sahitya',
+    category: 'Music',
     author: 'Karan Sharma',
     date: 'Oct 21, 2025',
     image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=800',
