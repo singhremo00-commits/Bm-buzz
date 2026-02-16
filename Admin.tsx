@@ -1,7 +1,20 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Language, TRANSLATIONS, CATEGORIES, CATEGORY_LABELS } from './constants';
-import { Lock, FileText, Image as ImageIcon, Tag, Send, ArrowLeft, LogOut, LayoutDashboard, Globe } from 'lucide-react';
+import { 
+  Lock, 
+  FileText, 
+  Image as ImageIcon, 
+  Tag, 
+  Send, 
+  ArrowLeft, 
+  LogOut, 
+  LayoutDashboard, 
+  Globe, 
+  Link as LinkIcon, 
+  Bold, 
+  Italic 
+} from 'lucide-react';
 
 interface AdminProps {
   currentLang: Language;
@@ -13,6 +26,7 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -37,6 +51,36 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
     setPassword('');
   };
 
+  const applyTag = (startTag: string, endTag: string) => {
+    const el = textAreaRef.current;
+    if (!el) return;
+
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const text = el.value;
+    const selected = text.substring(start, end);
+    
+    let processedTags = startTag;
+    if (startTag.includes('href=""')) {
+      const url = prompt("Enter the URL (e.g., https://google.com):", "https://");
+      if (url === null) return; // Cancelled
+      processedTags = startTag.replace('href=""', `href="${url}" target="_blank" class="text-primary underline font-bold"`);
+    }
+
+    const before = text.substring(0, start);
+    const after = text.substring(end);
+    const newText = before + processedTags + selected + endTag + after;
+
+    setFormData({ ...formData, description: newText });
+    
+    // Set focus back and adjust selection
+    setTimeout(() => {
+      el.focus();
+      const newCursorPos = start + processedTags.length + selected.length + endTag.length;
+      el.setSelectionRange(newCursorPos, newCursorPos);
+    }, 10);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onPublish(formData);
@@ -49,8 +93,6 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
       description: ''
     });
   };
-
-  const labels = CATEGORY_LABELS['en']; // Use English keys for internal logic
 
   if (!isAuthenticated) {
     return (
@@ -156,7 +198,7 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
               {/* Category */}
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center">
-                  <Tag size={14} className="mr-2 text-primary" /> Target Section (Synced with Menu)
+                  <Tag size={14} className="mr-2 text-primary" /> Target Section
                 </label>
                 <div className="relative">
                   <select
@@ -194,15 +236,46 @@ const Admin: React.FC<AdminProps> = ({ currentLang, onBack, onPublish }) => {
 
             {/* Content */}
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center">
-                <FileText size={14} className="mr-2 text-primary" /> Detailed Story / Article Body
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center">
+                  <FileText size={14} className="mr-2 text-primary" /> Detailed Story / Article Body
+                </label>
+                {/* Toolbar */}
+                <div className="flex bg-gray-100 rounded-lg p-1 space-x-1 shadow-inner border border-gray-200">
+                  <button 
+                    type="button" 
+                    onClick={() => applyTag('<b>', '</b>')}
+                    className="p-1.5 hover:bg-white rounded transition-colors text-gray-600 hover:text-black shadow-sm"
+                    title="Bold"
+                  >
+                    <Bold size={14} />
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => applyTag('<i>', '</i>')}
+                    className="p-1.5 hover:bg-white rounded transition-colors text-gray-600 hover:text-black shadow-sm"
+                    title="Italic"
+                  >
+                    <Italic size={14} />
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => applyTag('<a href="">', '</a>')}
+                    className="p-1.5 hover:bg-primary hover:text-white rounded transition-colors text-gray-600 shadow-sm flex items-center space-x-1 px-2"
+                    title="Add Link"
+                  >
+                    <LinkIcon size={14} />
+                    <span className="text-[9px] font-black uppercase tracking-widest">Link</span>
+                  </button>
+                </div>
+              </div>
               <textarea
+                ref={textAreaRef}
                 required
                 rows={10}
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Type the full story here. You can use HTML tags like <h2> or <p> for formatting..."
+                placeholder="Select any word and click the toolbar icons to format..."
                 className="w-full px-6 py-6 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-sans leading-relaxed text-gray-700 shadow-inner"
               />
             </div>
