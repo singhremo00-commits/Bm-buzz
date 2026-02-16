@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -135,43 +134,40 @@ const App: React.FC = () => {
       
       {activePage !== 'Admin' && <NewsTicker currentLang={language} />}
 
-      <main className="flex-grow container mx-auto px-4 py-6">
+      <main className="flex-grow container mx-auto px-4 py-4 md:py-6">
         {isLoading && activePage !== 'Admin' && activePage !== 'About' && (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-3"></div>
-            <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-[9px]">Loading BMBuzz Feed...</p>
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mb-2"></div>
+            <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-[8px]">Syncing BMBuzz...</p>
           </div>
         )}
 
-        <div className={`grid grid-cols-1 ${activePage === 'Admin' || activePage === 'About' ? '' : 'lg:grid-cols-12'} gap-8`}>
+        <div className={`grid grid-cols-1 ${activePage === 'Admin' || activePage === 'About' ? '' : 'lg:grid-cols-12'} gap-6`}>
           
           <div className={activePage === 'Admin' || activePage === 'About' ? 'w-full' : 'lg:col-span-8'}>
             {activePage === 'Home' && !isLoading && (
-              <div className="space-y-10">
+              <div className="space-y-8">
                 {featuredPost ? (() => {
                   const info = getPostInfo(featuredPost);
                   return (
-                    <section className="relative group cursor-pointer overflow-hidden rounded-2xl shadow-xl" onClick={() => handlePostClick(featuredPost.id)}>
-                      <div className="aspect-[16/9] w-full bg-gray-200">
+                    <section className="relative group cursor-pointer overflow-hidden rounded-xl shadow-lg" onClick={() => handlePostClick(featuredPost.id)}>
+                      <div className="aspect-[16/8] w-full bg-gray-200">
                         <img src={featuredPost.image} alt={info.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
                       </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
-                      <div className="absolute bottom-0 left-0 p-6 md:p-10 text-white max-w-4xl">
-                        <span className="bg-primary text-white text-[9px] font-black px-2.5 py-1 uppercase rounded-sm mb-3 inline-block tracking-[0.2em]">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                      <div className="absolute bottom-0 left-0 p-5 md:p-8 text-white max-w-4xl">
+                        <span className="bg-primary text-white text-[8px] font-black px-2 py-0.5 uppercase rounded-sm mb-2 inline-block tracking-[0.15em]">
                           {labels[featuredPost.category] || featuredPost.category}
                         </span>
-                        <h2 className="text-2xl md:text-4xl font-extrabold font-title tracking-tight leading-[1.2] mb-3 group-hover:underline decoration-primary">
+                        <h2 className="text-xl md:text-3xl font-extrabold font-title tracking-tight leading-tight mb-1.5 group-hover:underline decoration-primary">
                           {info.title}
                         </h2>
-                        <div className="flex items-center space-x-4 mb-4 text-[10px] font-bold uppercase tracking-wider text-gray-300">
-                          <span className="flex items-center space-x-2">
-                             <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
-                             <span>{featuredPost.author}</span>
-                          </span>
-                          <span className="opacity-40">/</span>
+                        <div className="flex items-center space-x-3 mb-2 text-[9px] font-bold uppercase tracking-wider text-gray-300 opacity-80">
+                          <span>{featuredPost.author}</span>
+                          <span className="opacity-30">|</span>
                           <span>{featuredPost.date}</span>
                         </div>
-                        <p className="text-sm text-gray-200 line-clamp-2 opacity-90 font-medium leading-normal">{info.excerpt}</p>
+                        <p className="text-xs text-gray-200 line-clamp-1 opacity-80 font-medium leading-normal">{info.excerpt}</p>
                       </div>
                     </section>
                   );
@@ -179,23 +175,25 @@ const App: React.FC = () => {
 
                 {otherNews.length > 0 && (
                   <section>
-                    <div className="flex items-center justify-between mb-8 border-b-2 border-primary/10 pb-3">
-                      <h3 className="text-xl font-black font-title uppercase tracking-tighter text-secondary">{t.latest}</h3>
+                    <div className="flex items-center justify-between mb-5 border-b border-gray-100 pb-2">
+                      <h3 className="text-sm font-black font-title uppercase tracking-widest text-secondary">{t.latest}</h3>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
                       {otherNews.map(post => {
                         const info = getPostInfo(post);
                         return (
                           <article key={post.id} className="flex flex-col cursor-pointer group" onClick={() => handlePostClick(post.id)}>
-                            <div className="aspect-[16/10] overflow-hidden rounded-xl mb-4 bg-gray-100 shadow-sm">
-                              <img src={post.image} alt={info.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <div className="aspect-[16/10] overflow-hidden rounded-lg mb-2.5 bg-gray-100">
+                              <img src={post.image} alt={info.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                             </div>
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-[9px] font-black text-primary uppercase tracking-[0.15em]">{labels[post.category] || post.category}</span>
-                              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{post.date}</span>
+                            <div className="flex justify-between items-center mb-0.5">
+                              <span className="text-[8px] font-black text-primary uppercase tracking-widest">{labels[post.category] || post.category}</span>
+                              <span className="text-[8px] font-bold text-gray-400 uppercase">{post.date}</span>
                             </div>
-                            <h4 className="text-[22px] font-extrabold font-title leading-snug group-hover:text-primary transition-colors mb-2 tracking-tight text-secondary">{info.title}</h4>
-                            <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed font-medium">{info.excerpt}</p>
+                            <h4 className="text-[22px] font-bold font-title leading-tight group-hover:text-primary transition-colors mb-1 tracking-tight text-secondary">
+                              {info.title}
+                            </h4>
+                            <p className="text-xs text-gray-500 line-clamp-2 leading-snug font-medium opacity-90">{info.excerpt}</p>
                           </article>
                         );
                       })}
@@ -207,37 +205,36 @@ const App: React.FC = () => {
 
             {activePage === 'Category' && (
               <div>
-                <nav className="flex text-[9px] text-gray-400 mb-6 font-black uppercase tracking-widest">
+                <nav className="flex text-[8px] text-gray-400 mb-4 font-black uppercase tracking-widest">
                   <span className="cursor-pointer hover:text-primary transition-colors" onClick={() => navigateTo('Home', '/')}>{t.backHome}</span>
-                  <span className="mx-3 opacity-30">/</span>
+                  <span className="mx-2 opacity-30">/</span>
                   <span className="text-primary">{labels[selectedCategory] || selectedCategory}</span>
                 </nav>
-                <h1 className="text-3xl md:text-4xl font-black font-title uppercase mb-10 pb-3 border-b-4 border-primary inline-block tracking-tighter text-secondary">
+                <h1 className="text-2xl font-black font-title uppercase mb-6 pb-2 border-b-2 border-primary inline-block tracking-tighter text-secondary">
                   {labels[selectedCategory] || selectedCategory}
                 </h1>
-                <div className="grid grid-cols-1 gap-12">
+                <div className="grid grid-cols-1 gap-6">
                   {allNews.filter(p => p.category === selectedCategory).length > 0 ? (
                     allNews.filter(p => p.category === selectedCategory).map(post => {
                       const info = getPostInfo(post);
                       return (
-                        <article key={post.id} className="flex flex-col md:flex-row gap-8 cursor-pointer group items-start" onClick={() => handlePostClick(post.id)}>
-                          <div className="md:w-1/3 aspect-[16/10] overflow-hidden rounded-xl shadow-md w-full shrink-0">
+                        <article key={post.id} className="flex flex-col md:flex-row gap-5 cursor-pointer group items-start" onClick={() => handlePostClick(post.id)}>
+                          <div className="md:w-1/4 aspect-[16/10] overflow-hidden rounded-lg w-full shrink-0 shadow-sm">
                             <img src={post.image} alt={info.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                           </div>
                           <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <span className="text-[9px] font-black text-primary uppercase tracking-widest">{labels[post.category] || post.category}</span>
-                              <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
-                              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{post.date}</span>
+                            <div className="flex items-center space-x-2 mb-0.5">
+                              <span className="text-[8px] font-black text-primary uppercase tracking-widest">{labels[post.category] || post.category}</span>
+                              <span className="text-[8px] font-bold text-gray-400 uppercase">{post.date}</span>
                             </div>
-                            <h2 className="text-[22px] md:text-[24px] font-extrabold font-title mb-3 group-hover:text-primary transition-colors leading-tight tracking-tight text-secondary">{info.title}</h2>
-                            <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed font-medium">{info.excerpt}</p>
+                            <h2 className="text-[22px] font-bold font-title mb-1.5 group-hover:text-primary transition-colors leading-tight tracking-tight text-secondary">{info.title}</h2>
+                            <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed font-medium">{info.excerpt}</p>
                           </div>
                         </article>
                       );
                     })
                   ) : (
-                    <div className="py-20 text-center text-gray-300 uppercase font-black tracking-[0.25em] text-xs border-2 border-dashed border-gray-100 rounded-3xl">
+                    <div className="py-12 text-center text-gray-300 uppercase font-black tracking-widest text-[10px] border border-dashed border-gray-100 rounded-2xl">
                       No updates in {selectedCategory} yet.
                     </div>
                   )}
@@ -248,24 +245,21 @@ const App: React.FC = () => {
             {activePage === 'Post' && selectedPost && (() => {
               const info = getPostInfo(selectedPost);
               return (
-                <article className="max-w-4xl mx-auto">
-                  <span className="bg-primary/5 text-primary text-[9px] font-black px-3 py-1 uppercase rounded-full mb-6 inline-block tracking-widest">
+                <article className="max-w-3xl mx-auto">
+                  <span className="bg-gray-100 text-primary text-[8px] font-black px-2 py-0.5 uppercase rounded mb-4 inline-block tracking-widest">
                     {labels[selectedPost.category] || selectedPost.category}
                   </span>
-                  <h1 className="text-3xl md:text-5xl font-extrabold font-title mb-6 leading-tight text-secondary tracking-tight">{info.title}</h1>
-                  <div className="flex items-center space-x-6 mb-8 pb-6 border-b border-gray-100 text-[9px] font-black text-gray-400 uppercase tracking-widest">
-                    <div className="flex items-center space-x-3 text-secondary">
-                      <div className="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center text-[9px] font-black shadow-sm">BM</div>
-                      <span>{selectedPost.author}</span>
-                    </div>
-                    <span className="opacity-30">/</span>
+                  <h1 className="text-2xl md:text-4xl font-extrabold font-title mb-4 leading-tight text-secondary tracking-tight">{info.title}</h1>
+                  <div className="flex items-center space-x-4 mb-6 pb-4 border-b border-gray-50 text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                    <span className="text-secondary">{selectedPost.author}</span>
+                    <span className="opacity-20">|</span>
                     <span>{selectedPost.date}</span>
                   </div>
-                  <div className="relative mb-10 group">
-                    <img src={selectedPost.image} alt={info.title} className="w-full rounded-xl shadow-lg" />
+                  <div className="mb-8">
+                    <img src={selectedPost.image} alt={info.title} className="w-full rounded-lg shadow-md" />
                   </div>
-                  <div className="prose prose-lg max-w-none text-secondary leading-relaxed font-medium">
-                    <div className="article-content space-y-6" dangerouslySetInnerHTML={{ __html: info.content }} />
+                  <div className="prose prose-sm max-w-none text-secondary leading-relaxed font-medium">
+                    <div className="article-content space-y-4" dangerouslySetInnerHTML={{ __html: info.content }} />
                   </div>
                 </article>
               );

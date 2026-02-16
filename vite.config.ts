@@ -3,13 +3,13 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: './', // Ensures all assets are loaded relative to the deployment path
+  base: '/', // Changed from './' to '/' for robust Vercel deployment
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
     emptyOutDir: true,
     rollupOptions: {
-      input: 'index.html', // Explicitly setting the entry HTML
+      input: 'index.html',
     },
   },
   server: {
